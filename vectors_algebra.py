@@ -39,8 +39,7 @@ def vec_axpy(alpha , x,y):
     x_shape = vec_shape(x)
     #if x and y have same shape
     if x_shape == vec_shape(y):
-        ret_vec= x
-        #for each element in x and y
+        ret_vec = [[0]*x_shape[1] for _ in range(x_shape[0])]        #for each element in x and y
         for row_counter in range(0, x_shape[0]):
             for col_counter in range(0, x_shape[1]):
                 #compute Alhpa*x + y
