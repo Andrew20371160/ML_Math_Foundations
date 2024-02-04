@@ -304,14 +304,4 @@ def vec_mult(x, y):
         # Return an error message if the number of columns in x is not equal to the number of rows in y
         return 'For 2 matrices x and y, the number of columns in x must be equal to the number of rows in y.'
 
-import random
-vec1 = zeroes([1000,1000])
-vec2 = zeroes([1000,1000])
-for i in range(0,1000):
-    for j in range(0,1000):
-        vec1[i][j] = random.randint(1,1000)
-        vec2[i][j] = random.randint(1,1000)
-
-
-vec_mult(vec1,vec2)
 
