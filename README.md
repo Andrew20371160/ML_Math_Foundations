@@ -6,3 +6,6 @@ Since python is an essintial porgramming languages in machine learning there is 
 -2nd term in college started so i'm very busy at the moment so sorry for not upadating the repo for so long.
 -for performance and as a dinasaur I will update the project to be a matrix library written in c++ so the vec.py is over by now and i will keep my word and 
 make the fully functional matrix library. 
+---huge update :
+I've built a big chunk of the vectors algebra file and the source file with its header file are now availabe at vector algebra folder
+note :in the header you can see functions that are built and tested its shown after the declaration itself feel free to use any code :)
