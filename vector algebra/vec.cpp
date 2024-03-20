@@ -23,14 +23,11 @@ matrix ::~matrix(){
         delete vec ;
         vec = NULL;
 }
-
+//copy constructor
 matrix::matrix(const matrix&mat){
     rows= mat.get_rows();
     cols= mat.get_cols();
     vec = get_vec(rows,cols) ;
-    //mat.copy(mat_src) ->mat = mat_src
-    //we only fix vector and its void
-    //then do copying mechanism
     for(int i =0 ; i <rows; i++){
         for(int j = 0 ; j<cols ; j++){
             if(abs(mat.vec[i][j])>=tolerance){
@@ -42,6 +39,31 @@ matrix::matrix(const matrix&mat){
         }
     }
 }
+//copy operator for overwritting in matrices 
+void matrix::operator=(const matrix&mat){
+    if(this!=&mat){
+        //then check if they don't have same shape
+        if(!same_shape(mat)){
+            //delete old memeory
+            for(int i =0  ;i<rows;i++){
+                delete[]vec[i] ;
+            }
+            delete vec ;
+            //reallocate for copying
+            rows = mat.rows;
+            cols = mat.cols ;
+            vec= get_vec(mat.get_rows(),mat.get_cols()) ;
+        }
+        //copying mechanism
+        for(int i = 0 ; i <rows;i++){
+            for(int j= 0 ; j<cols ;j++){
+                vec[i][j] = mat.vec[i][j] ;
+            }
+        }
+
+}
+}
+
 
 
 int matrix ::get_rows()const{
