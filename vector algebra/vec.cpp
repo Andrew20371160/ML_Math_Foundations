@@ -648,11 +648,11 @@ bool matrix:: is_scalar(void){//tested
     }
     return false ;
 }
-// Calculate the rank of this matrix
+// Calculates the rank of this matrix
 int matrix ::rank(void){//tested
 //first check if its a square matrix
     if(is_square()){
-        //first perform gaussian elimination downward
+        //then perform gaussian elimination downward
         matrix temp_mat = utri() ;
         int counter = 0;
         //then count number of rows that has atleast one non zero element
@@ -675,7 +675,7 @@ int matrix ::rank(void){//tested
     return -1 ;
 }//tested
 
-// Check if this matrix is skew-symmetric
+// Checks if this matrix is skew-symmetric
 bool matrix ::is_skew_symmetric(void){
     if(vec&&is_square()){
         for(int i = 0 ; i <rows;i++){
@@ -691,7 +691,7 @@ bool matrix ::is_skew_symmetric(void){
     return false ;
 
 }
-// Check if this matrix is orthogonal
+// Checks if this matrix is orthogonal
 bool matrix ::is_orthogonal(void){
     matrix trans_mat = transpose() ;
     trans_mat = *this *trans_mat ;
