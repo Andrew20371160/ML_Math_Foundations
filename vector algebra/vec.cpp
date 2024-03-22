@@ -648,11 +648,11 @@ bool matrix:: is_scalar(void){//tested
     }
     return false ;
 }
-// Calculates the rank of this matrix
+// Calculate the rank of this matrix
 int matrix ::rank(void){//tested
 //first check if its a square matrix
     if(is_square()){
-        //then perform gaussian elimination downward
+        //first perform gaussian elimination downward
         matrix temp_mat = utri() ;
         int counter = 0;
         //then count number of rows that has atleast one non zero element
@@ -675,7 +675,7 @@ int matrix ::rank(void){//tested
     return -1 ;
 }//tested
 
-// Checks if this matrix is skew-symmetric
+// Check if this matrix is skew-symmetric
 bool matrix ::is_skew_symmetric(void){
     if(vec&&is_square()){
         for(int i = 0 ; i <rows;i++){
@@ -691,11 +691,72 @@ bool matrix ::is_skew_symmetric(void){
     return false ;
 
 }
-// Checks if this matrix is orthogonal
+// Check if this matrix is orthogonal
 bool matrix ::is_orthogonal(void){
     matrix trans_mat = transpose() ;
     trans_mat = *this *trans_mat ;
     return trans_mat.is_identity() ;
 }
+// Check if this matrix is nilpotent
+bool matrix :: is_nilpotent(void){
+    if(is_square()){
+        //keep multiplying the matrix by itself untill the nth power
+        matrix mat_pow = *this ;
+        matrix zeroes(rows,cols,0) ;
+        for(int i = 0 ; i<rows ; i++){
+            if(mat_pow==zeroes){
+                return true ;
+            }
+            else{
+                mat_pow =  mat_pow*mat_pow ;
+            }
+        }
+        return false ;
+    }
+    return false ;
+}
 
+// Check if this matrix is involutory
+bool matrix :: is_involutory(void){
+    if(is_square()){
+        return inverse() ==*this  ;
+    }
+    return false ;
+}
 
+void matrix:: lu_fact(matrix&lower_fact,matrix&upper_fact) {
+    //first check if its square matrix
+    if(is_square()){
+        //the lower_fact matrix is the identity matrix (at first) in which we store
+        // the constants during the gaussian elimination of the original matrix
+        //after finisning the gaussian elimination the upper_fact is finished
+        lower_fact.identity() ;
+        //copy original matrix into upper_fact to performa gaussian elimination on it
+        upper_fact = *this  ;
+        for(int up_r = 0;up_r<rows-1; up_r++){
+            for(int low_r = up_r+1; low_r<rows; low_r++){
+            //check first if upper element is not zero
+                if(upper_fact.vec[up_r][up_r]==0){
+                    //partial pivoting will be added later
+                    cout<<"zero encountered at the main diagoanl use partial pivoting";
+                    return  ;
+                }
+                else{
+                    //the constant we calculate
+                    float c = -1*(upper_fact.vec[low_r][up_r]/upper_fact.vec[up_r][up_r]);
+                    //first record it into the lower_fact matrix at its position
+                    lower_fact.vec[low_r][up_r]  = -1* c ;
+                    for(int i =0 ; i<cols;i++){
+                        //then continue the gaussian elimination
+                        upper_fact.vec[low_r][i]+=c*upper_fact.vec[up_r][i] ;
+                    }
+                }
+            }
+        }
+    }
+else{
+    cout<<square_error;
+    lower_fact =  matrix(1,1,-1) ;
+    upper_fact =  matrix(1,1,-1) ;
+}
+}
