@@ -829,6 +829,3 @@ matrix matrix :: rref(matrix&pivots_indices){
 
     return ret_mat ;
 }
-
-
-
