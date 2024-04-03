@@ -853,7 +853,7 @@ matrix matrix :: rref(matrix&pivots_indices){
 bool matrix ::is_independent(void){
     return rank() ==cols ;
 }
-//dimensino of the column space
+//returns dimension of the column space
 int matrix ::dim_col(void){
     return rank() ;
 }
