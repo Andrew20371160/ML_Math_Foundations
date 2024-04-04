@@ -765,13 +765,16 @@ void matrix:: lu_fact(matrix&lower_fact,matrix&permutation,matrix&upper_fact) {
         permutation.identity() ;
         //copy original matrix into upper_fact to performa gaussian elimination on it
         upper_fact = *this  ;
-        for(int up_r = 0;up_r<rows-1; up_r++){
+        for(int up_r = 0;up_r<rows; up_r++){
             int pivot_condition =upper_fact.is_pivot(up_r,up_r);
             if(pivot_condition!=-1){
                 //aka its a pivot
-            if(pivot_condition==up_r){
+                //if a switch happened
+            if(pivot_condition!=up_r){
+                  permutation.switch_rows(up_r,pivot_condition);
+            }
                 //no switch happened
-            for(int low_r = up_r+1; low_r<rows; low_r++){
+            for(int low_r = up_r+1; low_r<rows-1; low_r++){
                     //check first if upper element is a pivot
                     //the constant we calculate
                     float c = -1*(upper_fact.vec[low_r][up_r]/upper_fact.vec[up_r][up_r]);
@@ -781,10 +784,6 @@ void matrix:: lu_fact(matrix&lower_fact,matrix&permutation,matrix&upper_fact) {
                         //then continue the gaussian elimination
                         upper_fact.vec[low_r][i]+=c*upper_fact.vec[up_r][i] ;
                     }
-                }
-            }
-                else {
-                    permutation.switch_rows(up_r,pivot_condition);
                 }
  }
                 else{
