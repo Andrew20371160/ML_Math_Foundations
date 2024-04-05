@@ -192,7 +192,7 @@ public:
     matrix basis_cols(void);//tested
     // Returns a set of vectors (as a matrix) that forms a basis for the vector space of the given dimension.
     matrix basis_rows(void);//tested
-    matrix null_rows(void) ;
+    matrix null_rows(matrix*) ;
     matrix null_cols(void) ;
 
 
