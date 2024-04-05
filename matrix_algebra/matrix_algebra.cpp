@@ -748,7 +748,7 @@ bool matrix :: is_involutory(void){
     }
     return false ;
 }
-//added permutatino matrix since during lu factorization if the rows are switched
+//added permutation matrix since during lu factorization if the rows are switched
 //if the pivot is not in its position it will be switched we have to keep track of this
 //using permutation matrix its set first as identity but if rows are switched
 //the rows of the identity are switched aswell
