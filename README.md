@@ -5,3 +5,5 @@ they are all tested if there are any bugs please let me know
 feel free to use any code :)
 -update:I've updated some core functions like gauss_down or previously called utri to work in both types of matrices aka the ones that have pivots on the main diagonal and the ones that have the pivots on any col and the rank is updated to calculate rank for all types of matrices 
 previously i thought it was only for square matrices but i was wrong 
+by tomorrow i will add the fourth and final space aka nullspace of the column space
+I've just added the nullspace of row space
