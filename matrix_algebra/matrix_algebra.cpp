@@ -919,7 +919,7 @@ bool matrix ::is_basis( int dimension){
     //check if they are independent and they span the column space of R^dimension
     return cols==dimension&&is_independent() ;
 }
-//returns the set of vectors that forms a basis in a space R^dimension
+//returns the set of vectors that forms a basis of the column space
 matrix matrix ::basis_cols(void) {
     //return matrix
     matrix ret_mat ;
