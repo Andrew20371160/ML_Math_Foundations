@@ -1157,3 +1157,30 @@ matrix matrix ::null_cols(void) {
     ret_mat = matrix(cols,1,0);
     return ret_mat ;
 }
+
+//it fixes a matrix by putting rows that corresponds to pivots first
+//then rist of rows at th every end this fixes an issue at rref
+//where if a row switch occurs it won't be recorded in elementary matrix
+//or you will need extra permutation matrix fixes the caller itself
+void matrix ::fix_pivots(void) {
+    matrix  original_pivots_indices ;
+    matrix  new_pivots_indices;
+    gauss_down(&new_pivots_indices,&original_pivots_indices) ;
+    int pivot_c = 0;
+    while(pivot_c<rows){
+        if(original_pivots_indices.vec[pivot_c][0]==-1){
+            int finder =pivot_c ;
+            while(finder <rows &&original_pivots_indices.vec[finder][0]==-1){
+                finder++;
+            }
+            if(finder<rows){
+                switch_rows(finder,pivot_c);
+            }
+            else{
+                return ;
+            }
+        }
+        pivot_c++;
+    }
+}
+
