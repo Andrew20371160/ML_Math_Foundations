@@ -1,16 +1,16 @@
 #ifndef VEC_H_INCLUDED
 #define VEC_H_INCLUDED
+/*-update : added fix_pivots() this function rearranges the matrix rows
+so that the rows contatining the pivotsare on top and the rest of rows at bottom
+its crucial when using functions like lu_fact not really since i added permutation matrix earlier
+but if you use elementary matrix from null_rows() and tried to test if elementary * matrix euqals
+rref(matrix) this sometimes isn't true since elementary matrix doesn't record the switches
+in rows that happens during the rref of the matrix its advisable to use after you initialize the matrix
+but i wouldn't force that its on you :) .
+*/
 #include <iostream>
 #include <math.h>
 #include <string.h>
-/*-update : added fix_pivots() this function rearranges the matrix rows 
-so that the rows contatining the pivotsare on top and the rest of rows at bottom 
-its crucial when using functions like lu_fact not really since i added permutation matrix earlier
-but if you use elementary matrix from null_rows() and tried to test if elementary * matrix euqals rref(matrix) 
-this sometimes isn't true since elementary matrix doesn't record the switches in rows that happens 
-during the rref of the matrix its advisable to use after you initialize the matrix
-but i wouldn't force that its on you :) .
-*/
 using namespace std ;
 //feel free to edit this value the way you want
 const float tolerance = 0.0001 ;
@@ -126,7 +126,10 @@ public:
     //added an optional input if you want to see where are the pivots
     //for each row just pass and address of the matrix and if you don't want
     //just leave it empty i use this functionality in other pieces of code
-    matrix gauss_down(matrix *,matrix*original_pivots_locations) ;//tested
+    //if you want to store new pivots locations in the matrix
+    //pass new_locations else old locations by default it returns new locations
+    enum {old_locations =0,new_locations=1};
+    matrix gauss_down(matrix*pivots_indices,int pivots_locations);//tested
     //performs gaussian elimination upward
     matrix gauss_up(matrix *) ;//tested
     //performs back substitution on a selected row and solution matrix is passed with it
