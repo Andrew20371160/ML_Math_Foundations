@@ -10,3 +10,5 @@ by tomorrow i will add the fourth and final space aka nullspace of the column sp
  Feel free to use any code :)
 -update : added fix_pivots() this function rearranges the matrix so that the rows contatining the pivots are on top and the rest of rows at bottom 
 its crucial when using functions like lu_fact not really since i added permutation matrix earlier  but if you use elementary matrix from null_rows() and tried to test of elementary * matrix = rref(matrix) this sometimes isn't true since elementary matrix doesn't record the changes in rows that happens during the rref of the matrix its advisable to use after you initialize the matrix but i wouldn't force that its on you :) .
+
+4/9/2024 update : added quality functions that allow for appending of 2 matrices one for appending by cols and the other for appending by rows and optimized some functions have fun
