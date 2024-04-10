@@ -349,22 +349,6 @@ float matrix ::theta(matrix&mat) {
     cout<<shape_error ;
     return -1 ;
 }
-// Check if this matrix is orthogonal
-bool matrix ::is_orthogonal(void){
-    matrix trans_mat = transpose() ;
-    trans_mat = *this *trans_mat ;
-    return trans_mat.is_identity() ;
-}
-//check if this matrix is orthogonal with matrix mat
-bool matrix ::is_orthogonal(matrix&mat) {
-    if(rows==mat.rows){
-       matrix trans= transpose() ;
-       trans = trans*mat ;
-       return trans.is_zero() ;
-    }
-    return false ;
-}
-
 bool matrix :: is_parallel(matrix&mat){
     return  abs(theta(mat))<=tolerance||abs(theta(mat)-180)<=tolerance ;
 }
@@ -1257,6 +1241,21 @@ void matrix ::fix_pivots(void) {
         }
         pivot_c++;
     }
+}
+// Check if this matrix is orthogonal
+bool matrix ::is_orthogonal(void){
+    matrix trans_mat = transpose() ;
+    trans_mat = *this *trans_mat ;
+    return trans_mat.is_identity() ;
+}
+//check if this matrix is orthogonal with matrix mat
+bool matrix ::is_orthogonal(matrix&mat) {
+    if(rows==mat.rows){
+       matrix trans= transpose() ;
+       trans = trans*mat ;
+       return trans.is_zero() ;
+    }
+    return false ;
 }
 
 matrix matrix::projection(void){
