@@ -548,7 +548,7 @@ float matrix::det(){
         float det_val = 1 ;
         unsigned int sign_change = 0   ;
         for(int i= 0  ; i<rows;i++){
-            if(original_pivots_indices.vec[i][i]!=1){
+            if(original_pivots_indices.vec[i][i]!=i){
                 sign_change++;
             }
             det_val*=mat_cpy.vec[i][i] ;
