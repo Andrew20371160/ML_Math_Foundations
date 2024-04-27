@@ -1,3 +1,10 @@
+4/27/2024 huge updates:
+untill i declare it when you use the class
+just do this -> matrix<data_type> mat instead of matrix
+since now it works with any data type like int ,float , etc
+and now works with non standard type complex
+im trying to implement fast forier transform wish me luck also more updates tomorrow after i sleep
+have a nice day :)
 4/22/2024 small updates:
 added cofactor which returns cofactor related to an element at the matrix 
 added cofactors which returns cofactors matrix 
