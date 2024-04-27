@@ -1604,11 +1604,5 @@ int matrix<DataType>:: is_pivot_up(int r_ind , int c_ind) {
         return ret_mat ;
     }
 
-#include <chrono>
-
-int main() {// Correct construction of the mid matrix
-forier_mat(2).show();
-  return 0;
-}
 
 
