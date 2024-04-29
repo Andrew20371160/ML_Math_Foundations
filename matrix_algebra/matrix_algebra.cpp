@@ -1638,6 +1638,26 @@ int matrix<DataType>:: is_pivot_up(int r_ind , int c_ind) {
         }
         return ret_mat ;
     }
+     //resize a matrix to wanted dimensions if the new total size is less
+    //then it copies that equal chunk of the older matrix into the new one
+    //if its more then the rest are by default equal to the value of zero
+    template <typename DataType>//by defaults it operates as equality operator
+    matrix<DataType> matrix<DataType>::resize(int wanted_rows ,int wanted_cols,DataType padding_value)const{
+       if(wanted_rows>0&&wanted_cols>0){
+           matrix<DataType> ret_mat= matrix<DataType>(wanted_rows,wanted_cols,padding_value) ;
+            int end_rows = (wanted_rows<rows)?wanted_rows:rows ;
+            int end_cols = (wanted_cols<cols)?wanted_cols:cols ;
+            for(int i = 0 ; i<end_rows;i++){
+                for(int j=0;j<end_cols;j++){
+                    ret_mat.at(i,j)=at(i,j) ;
+                }
+            }
+            return ret_mat ;
+        }
+        cout<<"Can't have dimensions less than 1 default garbage value is -1";
+        return matrix<DataType>(1,1,-1) ;
+    }
+
 
     // Function to compute the Fast Fourier Transform (FFT) of a column
     template <typename DataType>
