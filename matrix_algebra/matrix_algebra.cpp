@@ -38,12 +38,7 @@ matrix<DataType>::matrix(const matrix&mat){
     vec = get_vec(rows,cols) ;
     for(int i =0 ; i <rows; i++){
         for(int j = 0 ; j<cols ; j++){
-            if(abs(mat.at(i,j))>tolerance){
                at(i,j) = mat.at(i,j);
-            }
-            else{
-                at(i,j) = 0 ;
-            }
         }
     }
 }
@@ -766,49 +761,32 @@ template <typename DataType>
 
 bool matrix<DataType>::is_upper_tri(void)const  {
     if(is_square()){
-     bool zero_flag= true ;
         for(int i =0 ; i <rows;i++){
-            for(int j=  0 ; j<cols; j++){
-                if(j<i){
-                    if(abs(at(i,j))<tolerance){
+            for(int j=  0 ; j<i; j++){
+                    if(abs(at(i,j))>0.0001){
                         return false ;
+
                     }
                 }
-                else{
-                    //check for rest of elements so that they aren't all zeroes
-                    zero_flag&=(abs(at(i,j))<tolerance)?false:true ;
-                }
             }
-        }
-        if(zero_flag!=true){
             return true ;
         }
-    }
     return false ;
 }
 template <typename DataType>
 
 bool matrix<DataType>::is_lower_tri()const {
-if(is_square()){
- bool zero_flag= true ;
-    for(int i =0 ; i <rows;i++){
-        for(int j=  0 ; j<cols; j++){
-            if(j>i){
-                if(abs(at(i,j))<tolerance){
-                    return false ;
+    if(is_square()){
+        for(int i =0 ; i <rows;i++){
+            for(int j=  i+1 ; j<rows; j++){
+                    if(abs(at(i,j))>0.0001){
+                        return false ;
+                    }
                 }
             }
-            else{
-                //check for rest of elements so that they aren't all zeroes
-                zero_flag&=(abs(at(i,j))<tolerance)?false:true ;
-            }
+            return true ;
         }
-    }
-    if(zero_flag!=true){
-        return true ;
-    }
-}
-return false ;
+    return false ;
 }
 // Check if this matrix<DataType>is scalar
 template <typename DataType>
@@ -1400,7 +1378,7 @@ int matrix<DataType>:: is_pivot_up(int r_ind , int c_ind) {
     }
     //this function takes a bunch of vectors in a matrix<DataType>and returns
     //the orthonormal vectors in a form of matrix<DataType>(performs gram-shmidt algorithm)
-/*when using gram_shmidt its better to use it with double and with very low 
+/*when using gram_shmidt its better to use it with double and with very low
 tolerance value very close to zero
 i've noticed it produces wrong answers due to those 2 problems when testing the algorithm */
     template <typename DataType>
@@ -1762,7 +1740,7 @@ i've noticed it produces wrong answers due to those 2 problems when testing the 
             matrix<DataType> pivots= get_pivots();
             if(pivots.rows==rows){
                 for(int i =  0; i<rows;i++){
-                    if(pivots.at(i,0)<=0){
+                    if(pivots.at(i,0)<=tolerance){
                         return false ;
                     }
                 }
@@ -1772,5 +1750,26 @@ i've noticed it produces wrong answers due to those 2 problems when testing the 
         }
         return false  ;
     }
+        template<typename DataType>
+    void matrix<DataType>:: qr_fact(matrix<DataType>&q,matrix<DataType>&r){
+        q= gram_shmidt() ;
+        r= q.transpose() *(*this) ;
+    }
+    template <typename DataType>
+    matrix<DataType> matrix<DataType>::eigen_values(void){
+        matrix<DataType>q,r ;
+        matrix<DataType>mat_cpy = *this;
+        while(!mat_cpy.is_upper_tri()){
+            mat_cpy.qr_fact(q,r) ;
+            mat_cpy= r*q;
+            mat_cpy.show() ;
+        }
+        matrix<DataType>eigen(mat_cpy.rows,1,0);
+        for(int i=  0 ; i<mat_cpy.rows;i++){
+            eigen.at(i,0) = mat_cpy.at(i,i) ;
+        }
+        return eigen ;
+    }
+
 
 
