@@ -31,7 +31,9 @@ enum{lower_half=0,upper_half};
 
 template<typename DataType>
 class matrix{
+
 private :
+//feel free to edit this value the way you want
 //2d array for holding data
 DataType *vec ;
 //dimensions of matrix
@@ -45,7 +47,7 @@ DataType*get_vec(int r ,int c){
         return ret_vec ;
     }
     return NULL ;
-}
+}//feel free to edit this value the way you want
 public:
     //empty matrix
     matrix();//tested
@@ -62,6 +64,7 @@ public:
     int get_rows()const;//tested
     //get cols value
     int get_cols()const;//tested
+
     //accessing element at a specified index
     DataType& at(int r_ind,int c_ind);//tested
         //accessing element at a specified index
@@ -137,7 +140,7 @@ public:
     enum {old_locations =0,new_locations=1};
     matrix gauss_down(matrix<int>*pivots_indices=NULL,int pivots_locations = new_locations)const ;//tested
     //performs gaussian elimination upward
-    matrix gauss_up(matrix<int>*)const  ;//tested
+    matrix gauss_up(matrix<int>*pivots_incices=NULL)const  ;//tested
     //performs back substitution on a selected row and solution matrix is passed with it
     DataType back_sub(int selected_row,const matrix& solution_matrix)const ;//tested
     //performs forward substitution on a selected row and solution matrix is passed with it
@@ -272,6 +275,10 @@ public:
     matrix get_pivots(matrix<int>*pivots_locations=NULL);
 
     bool is_positive_definite(void);
+
+    void qr_fact(matrix&q,matrix&r)  ;
+
+    matrix eigen_values(void) ;
 };
     //when calling do this
     //identity<DataType>
