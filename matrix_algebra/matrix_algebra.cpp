@@ -1400,6 +1400,9 @@ int matrix<DataType>:: is_pivot_up(int r_ind , int c_ind) {
     }
     //this function takes a bunch of vectors in a matrix<DataType>and returns
     //the orthonormal vectors in a form of matrix<DataType>(performs gram-shmidt algorithm)
+/*when using gram_shmidt its better to use it with double and with very low 
+tolerance value very close to zero
+i've noticed it produces wrong answers due to those 2 problems when testing the algorithm */
     template <typename DataType>
     matrix<DataType> matrix<DataType>::gram_shmidt(void)const {
         //array of projections for each vector from 0 to n-1
