@@ -1,4 +1,7 @@
 5/1/0:
+Important notes:
+when using gram_shmidt its better to use it with double and with very low tolerance value very close to zero
+i've noticed this alot when testing the algorithm 
 fixed a small issue in inverse where if a row is switched during the pivoting the return matrix 
 or the inverse matrix didn't record that 
 4/30/2024 small update :
