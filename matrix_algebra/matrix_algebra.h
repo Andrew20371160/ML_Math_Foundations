@@ -1,12 +1,13 @@
 #ifndef MATRIX_ALGEBRA_H_INCLUDED
 #define MATRIX_ALGEBRA_H_INCLUDED
-/*-update : added fix_pivots() this function rearranges the matrix rows
-so that the rows contatining the pivotsare on top and the rest of rows at bottom
-its crucial when using functions like lu_fact not really since i added permutation matrix earlier
-but if you use elementary matrix from null_rows() and tried to test if elementary * matrix euqals
-rref(matrix) this sometimes isn't true since elementary matrix doesn't record the switches
-in rows that happens during the rref of the matrix its advisable to use after you initialize the matrix
-but i wouldn't force that its on you :) .
+/*
+//tolerance is used in calculations like inverse and gram-shmidt ,gauss
+//this is sufficient for gram-shmidt since it requires a high degree of percision
+const double tolerance =1e-12;
+//check_tolerance is for is_identity , is_zero , aka every function starting with is_
+//modify this the way you want
+const double check_tolerance =1e-6;
+both consants are found in complex.h file
 */
 #include <iostream>
 #include <math.h>
