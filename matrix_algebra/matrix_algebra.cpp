@@ -585,6 +585,7 @@ DataType matrix<DataType>::det()const {
     return -1 ;
 }
 //access and modify an element at a certain position
+//abstraction from usage of 1D array instead of a 2D array
 template <typename DataType>
 DataType& matrix<DataType>::at(int r_ind,int c_ind){
     if(r_ind>=0&&r_ind<rows&&c_ind>=0&&c_ind<cols){
