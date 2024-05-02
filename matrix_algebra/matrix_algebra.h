@@ -35,7 +35,7 @@ class matrix{
 
 private :
 //feel free to edit this value the way you want
-//2d array for holding data
+//1d array for holding data
 DataType *vec ;
 //dimensions of matrix
 int rows , cols;
