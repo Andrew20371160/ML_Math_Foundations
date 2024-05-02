@@ -24,7 +24,7 @@ matrix<DataType>::matrix(int r,int c,DataType value){
                     at(i,j) = value;
                 }
             }
-    }
+        }
 }
 template <typename DataType>
 matrix<DataType>::~matrix(){
@@ -38,9 +38,9 @@ matrix<DataType>::matrix(const matrix&mat){
     vec = get_vec(rows,cols) ;
     for(int i =0 ; i <rows; i++){
         for(int j = 0 ; j<cols ; j++){
-               at(i,j) = mat.at(i,j);
+                at(i,j) = mat.at(i,j);
+            }
         }
-    }
 }
 
 template <typename DataType>
@@ -130,6 +130,7 @@ DataType matrix<DataType>::dot(const matrix&mat)const{
     cout<<shape_error;
     return -1 ;
 }
+
 //performs a*x+y
 template <typename DataType>
 DataType matrix<DataType>::axpy(DataType alpha,const matrix&y)const{
@@ -187,9 +188,9 @@ void matrix<DataType>:: show(void)const {
             cout<<'\n' ;
             for(int col_counter = 0  ; col_counter<cols;col_counter++){
                 cout<<at(row_counter,col_counter)<<" ";
+            }
         }
     }
-}
 }
 //turns the whole matrix<DataType>into a string ease printing
 template <typename DataType>
@@ -247,8 +248,8 @@ matrix<DataType> matrix<DataType>::operator*(DataType scalar)const{
         for(int i = 0 ;i<rows; i++){
             for(int j = 0 ; j<cols ;j++){
                 ret_mat.at(i,j)=at(i,j)*scalar ;
+            }
         }
-    }
 
         return ret_mat  ;
     }
@@ -314,12 +315,11 @@ bool matrix<DataType>::is_symmetric(void)const {
     if(vec&&is_square()){
         for(int i = 0 ; i <rows;i++){
             for(int j=i+1;j<cols;j++){
-                if(at(i,j)!=conjugate(at(j,i))){
+                if(abs(at(i,j)-conjugate(at(j,i)))>check_tolerance){
                     return false ;
+                }
             }
         }
-
-    }
     return true ;
     }
     return false ;
@@ -327,22 +327,7 @@ bool matrix<DataType>::is_symmetric(void)const {
 template <typename DataType>
 
 bool matrix<DataType>::is_diagonal(void) const {
-    if (vec && is_square()) {
-        int zero_flag=true ;
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j <cols; j++) {
-                if (i != j &&abs(at(i,j))>tolerance) {
-                    return false;
-                }
-            else{
-                //zero flag checks for diagonal elements so that it makes sure they aren't all zeroes
-                zero_flag &=abs(at(i,j))<tolerance;
-            }
-        }
-    }
-        return (zero_flag==false);
-    }
-    return false  ;
+    return is_upper_tri()&&is_lower_tri();
 }
 template <typename DataType>
 DataType matrix<DataType>::norm2(void) const {
@@ -393,7 +378,7 @@ bool matrix<DataType>::is_orthogonal(const matrix&mat) const {
 template <typename DataType>
 
 bool matrix<DataType>:: is_parallel(const matrix&mat)const {
-    return  abs(theta(mat))<=tolerance||abs(theta(mat)-180)<=tolerance ;
+    return  abs(theta(mat))<=tolerance||abs(theta(mat)-180)<=check_tolerance ;
 }
 template <typename DataType>
 
@@ -401,11 +386,11 @@ bool matrix<DataType>::operator == (const matrix&mat)const{
     if(same_shape(mat)){
        for (int i = 0; i < rows; i++){
             for (int j = 0; j <cols; j++) {
-             if(abs(at(i,j)-mat.at(i,j))>tolerance){
+             if(abs(at(i,j)-mat.at(i,j))>check_tolerance){
                 return false ;
+                }
             }
         }
-    }
         return true ;
     }
     return false ;
@@ -623,38 +608,44 @@ matrix<DataType> matrix<DataType>::inverse(void)const {
         matrix<DataType>mat_cpy =*this ;
         //creating return matrix<DataType>which at first will be identity
         matrix<DataType>ret_mat=identity<DataType>(rows);
-        //first do Gaussian elimination downward
-        for(int up_r = 0 ; up_r<rows-1;up_r++){
-                for(int low_r = up_r+1;low_r<rows;low_r++){
-                    int pivot_condition = mat_cpy.is_pivot(up_r,up_r) ;
-                    if(pivot_condition!=-1){
-                        if(pivot_condition!=up_r){
-                            //switch occurred
-                            ret_mat.switch_rows(pivot_condition,up_r);
-                        }
-                            DataType c =(mat_cpy.at(low_r,up_r)/mat_cpy.at(up_r,up_r)) *-1  ;
-                            for(int col_c = 0 ; col_c<cols ; col_c++){
-                                mat_cpy.at(low_r,col_c) += c*mat_cpy.at(up_r,col_c) ;
-                                ret_mat.at(low_r,col_c) += c*ret_mat.at(up_r,col_c);
-                            }
-                    }
-                    else{
-                        //if the pivot is zero then its not invertible matrix
-                        cout<<"determinant of the passed matrix<DataType>is zero or not squre matrix<DataType>to begin with";
-                        matrix<DataType>error_matrix(1,1,-1);
-                        return error_matrix;
+    //when getting pivot indices we have to keep track of old pivot since
+    //the new pivot won't exist in the same column so we go to next column each iteration
+    for(int up_r = 0;up_r<rows; up_r++){
+        int pivot_condition = mat_cpy.is_pivot(up_r,up_r) ;
+        if(pivot_condition!=-1){
+            if(pivot_condition!=up_r){
+                ret_mat.switch_rows(up_r,pivot_condition);
+            }
+        //make sure you aren't out of bounds
+            for(int low_r = up_r+1; low_r<rows; low_r++){
+                //do gaussian elimination downward
+                //check if lower element is not zero to save processing power
+                if(abs(mat_cpy.at(low_r,up_r))>=tolerance){
+                    DataType c = (mat_cpy.at(low_r,up_r)/mat_cpy.at(up_r,up_r))*-1;
+                    for(int i =0 ; i<cols;i++){
+                        mat_cpy.at(low_r,i)+=c*mat_cpy.at(up_r,i) ;
+                        ret_mat.at(low_r,i)+=c*ret_mat.at(up_r,i) ;
                     }
                 }
             }
+        }
+        else{
+            cout<<"determinant of the passed matrix<DataType>is zero or not a squre matrix<DataType>to begin with";
+            return matrix<DataType>(1,1,-1 );
+        }
+    }
+
         //then do Gaussian elimination upward
             //here we don't need to check if its a pivot since its shown clearly
             //from first elemination that it contains pivots at each row
             for(int low_r = rows-1 ; low_r>0;low_r--){
                 for(int up_r = low_r-1;up_r>=0;up_r--){
-                    DataType c = (mat_cpy.at(up_r,low_r) /mat_cpy.at(low_r,low_r))*-1  ;
-                    for(int col_c = 0 ; col_c<cols ; col_c++){
-                        mat_cpy.at(up_r,col_c)+= c*mat_cpy.at(low_r,col_c);
-                        ret_mat.at(up_r,col_c)+= c*ret_mat.at(low_r,col_c);
+                    if(abs(mat_cpy.at(up_r,low_r))>tolerance){
+                        DataType c = (mat_cpy.at(up_r,low_r) /mat_cpy.at(low_r,low_r))*-1  ;
+                        for(int col_c = 0 ; col_c<cols ; col_c++){
+                            mat_cpy.at(up_r,col_c)+= c*mat_cpy.at(low_r,col_c);
+                            ret_mat.at(up_r,col_c)+= c*ret_mat.at(low_r,col_c);
+                        }
                     }
                 }
             }
@@ -664,8 +655,8 @@ matrix<DataType> matrix<DataType>::inverse(void)const {
                 }
             }
             return ret_mat ;
-}
-cout<<"determinant of the passed matrix<DataType>is zero or not a squre matrix<DataType>to begin with";
+        }
+    cout<<"determinant of the passed matrix<DataType>is zero or not a squre matrix<DataType>to begin with";
     matrix<DataType> error_matrix(1,1,-1);
     return error_matrix;
 }
@@ -705,13 +696,8 @@ void matrix<DataType>::operator=(const matrix<DataType>&mat){
         //copying mechanism
         for(int i = 0 ; i <rows;i++){
             for(int j= 0 ; j<cols ;j++){
-            if(abs(mat.at(i,j))>tolerance){
-                at(i,j) = mat.at(i,j) ;
+                    at(i,j) = mat.at(i,j) ;
             }
-            else{
-                at(i,j) = 0  ;
-            }
-        }
         }
 
     }
@@ -730,12 +716,12 @@ bool matrix<DataType>:: is_identity(void)const {
     for(int i = 0 ; i<rows;i++){
         for(int j= 0 ; j<cols; j++){
             if(i==j){
-                if(abs(at(i,j)-1)>tolerance) {
+                if(abs(at(i,j)-1)>check_tolerance) {
                     return false ;
                 }
             }
             else{
-                if(abs(at(i,j))>tolerance){
+                if(abs(at(i,j))>check_tolerance){
                     return false ;
                 }
             }
@@ -750,7 +736,7 @@ template <typename DataType>
 bool matrix<DataType>::is_zero(void)const {
     for(int i = 0; i<rows;i++){
         for(int j= 0 ;j<cols ;j++){
-            if(abs(at(i,j))>tolerance){
+            if(abs(at(i,j))>check_tolerance){
                 return false ;
             }
         }
@@ -763,7 +749,7 @@ bool matrix<DataType>::is_upper_tri(void)const  {
     if(is_square()){
         for(int i =0 ; i <rows;i++){
             for(int j=  0 ; j<i; j++){
-                    if(abs(at(i,j))>0.0001){
+                    if(abs(at(i,j))>check_tolerance){
                         return false ;
 
                     }
@@ -779,7 +765,7 @@ bool matrix<DataType>::is_lower_tri()const {
     if(is_square()){
         for(int i =0 ; i <rows;i++){
             for(int j=  i+1 ; j<rows; j++){
-                    if(abs(at(i,j))>0.0001){
+                    if(abs(at(i,j))>check_tolerance){
                         return false ;
                     }
                 }
@@ -796,12 +782,12 @@ bool matrix<DataType>:: is_scalar(void)const {//tested
         for(int i=  0 ; i<rows; i++){
             for(int j= 0  ;j<cols ; j++){
                 if(i==j){
-                    if(abs(at(i,j)-val)>tolerance){
+                    if(abs(at(i,j)-val)>check_tolerance){
                         return false ;
                     }
                 }
                 else{
-                    if(abs(at(i,j))>tolerance){
+                    if(abs(at(i,j))>check_tolerance){
                         return false ;
                     }
                 }
@@ -836,7 +822,7 @@ bool matrix<DataType>::is_skew_symmetric(void)const {
     if(vec&&is_square()){
         for(int i = 0 ; i <rows;i++){
             for(int j=i+1;j<cols;j++){
-                if(abs(at(i,j)-at(j,i))>tolerance){
+                if(abs(at(i,j)-conjugate(at(j,i)))>check_tolerance){
                     return false ;
             }
         }
@@ -1336,7 +1322,6 @@ int matrix<DataType>:: is_pivot_up(int r_ind , int c_ind) {
         matrix<DataType>Atrans  = transpose() ;
         matrix<DataType>AtransA= Atrans *(*this) ;
         //get inverse
-
         AtransA = AtransA.inverse() ;
         //projection matrix<DataType>for a system A
         //p  = A (AT A)^-1 AT
@@ -1354,6 +1339,7 @@ int matrix<DataType>:: is_pivot_up(int r_ind , int c_ind) {
             matrix<DataType>ret_mat = Atrans*(*this);
             //append and solve [AT*A|AT*b]
             Atrans= Atrans*data_set;
+
             ret_mat = ret_mat.append_cols(Atrans) ;
             return ret_mat.solve();
         }
@@ -1391,7 +1377,6 @@ i've noticed it produces wrong answers due to those 2 problems when testing the 
         //temporary storage for the resultant vector
         matrix<DataType>res(rows,1) ;
         //here we store projection[i]*vec
-
         matrix<DataType>temp(rows,1) ;
         //length of a vector variable
         DataType len = 0;
@@ -1660,7 +1645,7 @@ i've noticed it produces wrong answers due to those 2 problems when testing the 
             return matrix(1,1,-1);
         }
     }
-        //fft for a matrix or a column the fft_col is just a helper function
+    //fft for a matrix or a column the fft_col is just a helper function
 
     template<typename DataType>
     matrix<DataType> matrix<DataType>:: fft(void)const{
@@ -1718,7 +1703,7 @@ i've noticed it produces wrong answers due to those 2 problems when testing the 
         cout<<"Can't have dimensions less than 1 default garbage value is -1";
         return matrix<DataType>(1,1,-1) ;
     }
-
+    //returns pivots of a matrix in column matrix
     template <typename DataType>
     matrix<DataType> matrix<DataType>:: get_pivots(matrix<int>*pivots_locations){
         matrix<DataType> pivots(rows,1,0);
@@ -1734,13 +1719,14 @@ i've noticed it produces wrong answers due to those 2 problems when testing the 
         }
         return pivots.resize(piv_c,1) ;
     }
+    //checks if a matrix is positive definite
     template <typename DataType>
     bool matrix<DataType>::is_positive_definite(void){
         if(is_symmetric()){
             matrix<DataType> pivots= get_pivots();
             if(pivots.rows==rows){
                 for(int i =  0; i<rows;i++){
-                    if(pivots.at(i,0)<=tolerance){
+                    if(abs(pivots.at(i,0))<=check_tolerance){
                         return false ;
                     }
                 }
@@ -1750,25 +1736,72 @@ i've noticed it produces wrong answers due to those 2 problems when testing the 
         }
         return false  ;
     }
-        template<typename DataType>
+    //performs QR factorization on a matrix and puts them in q ,r passed in the function input
+    template<typename DataType>
     void matrix<DataType>:: qr_fact(matrix<DataType>&q,matrix<DataType>&r){
         q= gram_shmidt() ;
         r= q.transpose() *(*this) ;
     }
+    //returns eigen values of a matrix in a column matrix
+    //computations made by qr factorization
+    //doesn't generate correct results all the time due to divergence issues
     template <typename DataType>
-    matrix<DataType> matrix<DataType>::eigen_values(void){
+    matrix<DataType> matrix<DataType>::eigen_values(int max_iteration,double min_diff){
         matrix<DataType>q,r ;
         matrix<DataType>mat_cpy = *this;
-        while(!mat_cpy.is_upper_tri()){
+        matrix<DataType>eigen(rows,1,0);
+        int iter = 0  ;
+        int diff_counter = 0;
+        while(!(mat_cpy.is_upper_tri())&&(diff_counter<rows)&&(iter<max_iteration)){
+            for(int j=  0   ;j <rows ; j++){
+                eigen.at(j,0)= mat_cpy.at(j,j) ;
+            }
             mat_cpy.qr_fact(q,r) ;
             mat_cpy= r*q;
-            mat_cpy.show() ;
+            //check difference
+            diff_counter = 0;
+            if(iter>max_iteration/2){
+                for(int j= 0 ; j<rows ;j++){
+                    if(abs(mat_cpy.at(j,j)-eigen.at(j,0))<=min_diff){
+                        diff_counter++ ;
+                    }
+                }
+            }
+            iter++ ;
         }
-        matrix<DataType>eigen(mat_cpy.rows,1,0);
         for(int i=  0 ; i<mat_cpy.rows;i++){
             eigen.at(i,0) = mat_cpy.at(i,i) ;
         }
         return eigen ;
+    }
+
+    //returns a matrix with data randomly initialized
+    template <typename DataType>
+    matrix<DataType> rand(int row_size,int col_size){
+        if(row_size>0&&col_size>0){
+            srand(time(0)) ;
+            matrix<DataType>ret_mat(row_size,col_size) ;
+            for(int i = 0  ;i<row_size;i++){
+                for(int j = 0 ; j<col_size;j++){
+                    ret_mat.at(i,j)=rand();
+                }
+            }
+        return ret_mat ;
+        }
+        cout<<"dimensions less than 1 default garbage value is -1" ;
+        return matrix<DataType>(1,1,-1) ;
+    }
+    //filters the matrix elements from data less than a specified tolerance
+    //by default filters by check_tolerance
+    template<typename DataType>
+    void matrix<DataType>::filter(double filter_tolerance){
+        for(int i =0 ; i<rows;i++){
+            for(int j=  0 ; j<cols;j++){
+                if(abs(at(i,j))<=filter_tolerance){
+                    at(i,j) = 0;
+                }
+            }
+        }
     }
 
 
