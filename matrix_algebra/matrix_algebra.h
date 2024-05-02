@@ -39,7 +39,7 @@ private :
 DataType *vec ;
 //dimensions of matrix
 int rows , cols;
-//helper function for allocating memory for a 2d array
+//helper function for allocating memory for a 1d array
 DataType*get_vec(int r ,int c){
     //check for passed parameters
     if(r>0&&c>0){
