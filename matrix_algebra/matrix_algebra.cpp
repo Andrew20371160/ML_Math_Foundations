@@ -1852,7 +1852,7 @@ i've noticed it produces wrong answers due to those 2 problems when testing the 
         //get S , then V
         //A=U S VT ->U = A VT S^-1
         matrix<DataType> AAT= (*this)*transpose() ;
-        s=AAT.eigen_values(100000,0.00001);//S^2
+        s=AAT.eigen_values(1000,0.00001);//S^2
         u =AAT.eigen_vectors(s);//U
         //a row to store length of each column
         for(int i = 0 ; i<u.cols;i++){
