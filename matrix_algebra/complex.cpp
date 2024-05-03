@@ -60,11 +60,10 @@
         *this = *this/scalar;
     }
     complex complex:: operator^(const double &power) const{
-        double rad = pow(abs(*this),power) ;
-        double the = power*theta() ;
-
-        return complex(rad*cos(the),rad*sin(the)) ;
-    }
+            double rad = pow(abs(*this),power) ;
+            double the = power*theta() ;
+            return complex(rad*cos(the),rad*sin(the)) ;
+        }
 
     double complex::theta(void)const{
         return atan2(im,re);
@@ -144,7 +143,9 @@
     long double conjugate(const long double&val){
     return val ;
     }
-
+    complex pow(const complex &c,int power){
+        return c^power  ;
+    }
     void complex ::operator=(const double & val) {
         re = val ;
         im = 0;
