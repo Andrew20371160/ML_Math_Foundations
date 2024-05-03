@@ -1,3 +1,4 @@
+
 5/2/2024 updates :
 1-fixed percision errors that lead to wrong output of gram_shmidt 
 using 2 tolerance values 
@@ -24,6 +25,8 @@ tested the function on 100000 randomly generated matrix and its stable now
 -added qr_fact(matrix q, matrix r ) whih performs qr factorization and puts the 
 reuslts in q and r input matrices
 have fun!
+
+-added rand which creates a randomly generated matrix at specified dimensions
 
 5/1/2024:
 Important notes:
