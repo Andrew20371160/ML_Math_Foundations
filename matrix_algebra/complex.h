@@ -5,7 +5,7 @@
 #include <string.h>
 //tolerance is used in calculations like inverse and gram-shmidt ,gauss
 //this is sufficient for gram-shmidt since it requires a percision
-const double tolerance =1e-12;
+const double tolerance =1e-18;
 //check_tolerance is for is_identity , is_zero , aka every function starting with is_
 //modify this the way you want
 const double check_tolerance =1e-7;
