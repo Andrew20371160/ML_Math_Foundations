@@ -220,8 +220,9 @@ public:
     matrix basis_cols(void)const ;//tested
     // Returns a set of vectors (as a matrix) that forms a basis for the row space
     matrix basis_rows(void)const ;//tested
-    //returns Null space of row space
-    matrix null_rows(matrix*)const  ;
+    //returns Null space of row space (optional if you want elementary matrix which turns the matrix into)
+    //its rref 
+    matrix null_rows(matrix*elementary=NULL)const  ;
     //returns null space of column space
     matrix null_cols(void)const  ;//tested
     //it fixes a matrix by putting rows that corresponds to pivots first
