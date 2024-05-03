@@ -1,4 +1,10 @@
-
+5/3/2024 updates :
+-added operator^ which calculates powers of a matrix (A^K)
+sadly the results are relient on the QR algorithm to get the eigen values so the results aren't quite correct
+-added svd (singal value decomposition) which again relies on the iteration algorithm to get the eigen values
+if the eigen values are correct the results for both power ,svd are perfectly fine but due to the nature of the
+iteration algorithm thats the best i can do 
+If you have any suggestions please let me know 
 5/2/2024 updates :
 1-fixed percision errors that lead to wrong output of gram_shmidt 
 using 2 tolerance values 
