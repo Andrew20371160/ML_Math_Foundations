@@ -208,7 +208,7 @@ added cofactors which returns cofactors matrix 
 1-added SubLambda I, which performs A-lambda *I and returns the result in a more efficient manner.
 2-added eigen_vectors, which returns the eigen vectors of a system using eigen 
 values passed as an input as a column matrix 
-3: Announcement: We will try to add eigenvalues in the near future since
+3: Announcement: I will try to add eigenvalues in the near future since
 requires a lot of thought and work. I will try my best.
 
 4/13/2024 update:
