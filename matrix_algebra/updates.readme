@@ -1,3 +1,76 @@
+5/18/2024 updates :(compression & more cache utilization updates)
+1-Added an enumeration for different types of matrices: general, upper triangular (utri),
+  lower triangular (ltri), diagonal, symmetric, anti-symmetric, constant, identity (iden),
+  and orthonormal.
+
+2-Added two integer pointers row_start and pindex for mapping upper and lower triangular matrices.
+  row_start maps the start of each row into the vector since upper and lower triangular matrices 
+  are stored without zeroes. pindex stores the locations of pivots.
+
+3-Added a boolean is_compressed to ensure a compressed matrix is not compressed again.
+
+4-Added an integer actual_size to store the actual size allocated for the matrix.
+
+5-Added a mutable array empty_vec of one element. For upper triangular matrices, it returns 0. 
+  It allows for compression of anti-symmetric matrices since the lower part is the negative of 
+  the upper part. For mutable, the idea is to store in empty_vec the value at the upper part 
+  multiplied by -1 and return the value so it can be both used in constant and non-constant matrices.
+
+6-Added a mutable integer matrix_type to store the type of the matrix: general, orthonormal, 
+upper triangular, etc.
+
+7-Added a function set_feature that fills matrix_type and sets at_ptr and at_ptr_c.
+
+8-Added a function set_at_ptr that sets at_ptr and at_ptr_c according to matrix_type.
+
+9-Added function pointers at_ptr and at_ptr_c that store the address of at. 
+  There are 8 at functions, one for each type of matrix. 
+  Each accesses the data according to the matrix type, 
+  so at_ptr is put inside the original at that's accessible to the user and inside it, 
+  it calls the specific accessor according to the matrix type using the pointer.
+
+10-Added compression functions for each matrix type: compress_utri, compress_ltri, 
+compress_symmetric, compress_anti_symmetric, compress_diagonal, compress_identity, 
+and compress_const. These functions compress the respective types of matrices.
+
+11-If a function returns a matrix with special features (like gauss_down, gauss_up, get_pivots,
+gram_shmidt), the matrix is compressed or matrix type if the matrix isn't compressible. 
+For example, if it's orthonormal, then the transpose is returned instead of performing 
+Gauss-Jordan elimination.
+
+12-Matrices performing operations on compressed matrices (for example, if you multiply a compressed 
+  matrix by a non-compressed one) do not cause problems. The code has been thoroughly tested and
+  adjusted to ensure stability.
+
+13-Added at functions for each matrix type. These functions are used to access elements 
+  in the matrix according to its type. Compressed matrices like upper triangular,
+  lower triangular, symmetric, anti-symmetric are stored in row-major order. For diagonal matrices,
+  only the main diagonal is stored. For constant matrices, only one element is stored. 
+  For identity matrices, only a 1 is stored.
+
+14-The at functions for each matrix type are: at_general, at_utri, at_ltri, at_diagonal, 
+  at_identity, at_const, at_symmetric, at_anti_symmetric. Each of these functions takes 
+  two integer parameters (presumably for the row and column indices) and returns a reference 
+  to a DataType.
+
+15-Added at functions for each matrix type for matrices that are constant and just used in 
+  calculations. These functions are: at_general_c, at_utri_c, at_ltri_c, at_diagonal_c, at_identity_c,
+  at_const_c, at_symmetric_c, at_anti_symmetric_c.
+  Each of these functions takes two integer parameters (presumably for the row and column indices) 
+  and returns a constant reference to a DataType.
+  
+16-Added a compress function. This function compresses the matrix. It doesn't require 
+  any parameters. It uses the fill_features function to analyze the matrix for special features, 
+  fills the matrix_type with the feature, and compresses it accordingly.
+
+17-Added a decompress function. This function decompresses the matrix. It doesn't require 
+any parameters.
+
+18-Added a fill_features function. This function analyzes the matrix for special features and 
+  fills matrix_type. It takes an optional parameter check_tol which defaults to 1e-6. 
+  This parameter is presumably used as a tolerance for checking the features of the matrix.
+
+
 5/6/2024 update:
 fixed transformer Now it works as intended; it worked only when producing the inverse, but now it works on any transformation.
 
