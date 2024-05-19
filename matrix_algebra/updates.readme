@@ -1,6 +1,15 @@
 5/19/2024 update :
-fixed a mistake in fill_features that caused it to compress to ltri insteaf of utri i reversed smth in the logic
-now works fine
+-fixed a mistake in fill_features that caused it to compress to ltri insteaf of utri i reversed smth
+in the logic now works fine
+-fixed an issue that affected doing multiple eliminations or operations on compressed matrices 
+for example compressing a utri to ltri caused a segmentation fault now it works fine 
+when you do gauss_down and then gauss_up or vice versa its compressed to diagaonal matrix 
+-now compress function is used only in compression along with using fill_features 
+so if you perform a gauss_up on a utri now it gets compressed into a diagonal matrix 
+-removed the dependency of pindex in any calculations since in some cases the matrix could be diagonal 
+for example so if u perform the rref on it it won't cause an issue 
+-still testing and will keep you updated 
+
 5/18/2024 updates :(compression & more cache utilization updates)
 1-Added an enumeration for different types of matrices: general, upper triangular (utri),
   lower triangular (ltri), diagonal, symmetric, anti-symmetric, constant, identity (iden),
