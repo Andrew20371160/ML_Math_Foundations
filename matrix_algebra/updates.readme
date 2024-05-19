@@ -1,3 +1,25 @@
+5/20/2024 update:
+added     int start_general(int row_i )const;
+    int end_general(int row_i )const;
+    int start_constant(int row_i )const;
+    int end_constant(int row_i )const;
+    int start_utri(int row_i)const ;
+    int end_utri(int row_i) const;
+    int start_ltri(int row_i)const ;
+    int end_ltri(int row_i)const ;
+    int start_diagonal(int row_i)const;
+    int end_diagonal(int row_i)const ;
+    int start_identity(int row_i) const;
+    int end_identity(int row_i)const ;
+    int start_symmetric(int row_i)const ;
+    int end_symmetric(int row_i)const;
+    int start_anti_symmetric(int row_i) const;
+    int end_anti_symmetric(int row_i)const ;
+these functions indicate the starting index and ending index for processing a row in matrix matrix multiplication 
+ofcourse there is a function pointer and according to the matrix type the setter ->void set_start_end_ptr(int  matrix_t);
+sets the pointer and the only function we are interested in is start ,end which calls the function pointer using the row_index
+I've teseted them slightly and they work and some operations are faster like multiplication according to matrix type.
+
 5/19/2024 update :
 -fixed a mistake in fill_features that caused it to compress to ltri insteaf of utri i reversed smth
 in the logic now works fine
