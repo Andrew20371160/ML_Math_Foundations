@@ -1,3 +1,6 @@
+5/19/2024 update :
+fixed a mistake in fill_features that caused it to compress to ltri insteaf of utri i reversed smth in the logic
+now works fine
 5/18/2024 updates :(compression & more cache utilization updates)
 1-Added an enumeration for different types of matrices: general, upper triangular (utri),
   lower triangular (ltri), diagonal, symmetric, anti-symmetric, constant, identity (iden),
