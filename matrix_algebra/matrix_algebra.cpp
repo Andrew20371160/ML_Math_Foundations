@@ -31,6 +31,7 @@ void matrix<DataType>::set_feature(int  matrix_t){
     if(matrix_t>=general&&matrix_t<=orthonormal){
         matrix_type= matrix_t;
         set_at_ptr(matrix_t) ;
+        set_start_end_ptr(matrix_t);
     }
 }
 //helper function for copying
@@ -147,8 +148,7 @@ matrix<DataType>::matrix(const matrix&mat){
     row_start=NULL ;
     pindex=NULL ;
     vec=NULL;
-    matrix_type= mat.matrix_type;
-    set_at_ptr(mat.matrix_type) ;
+    set_feature(mat.matrix_type);
     acutal_size=  mat.acutal_size ;
     empty_vec[0] =mat.empty_vec[0];
     is_compressed=mat.is_compressed;
@@ -159,7 +159,7 @@ matrix<DataType>::matrix(const matrix&mat){
     //memory allocation and copy
     vec = get_vec<DataType>(mat.acutal_size,1) ;
     for(int  i =0 ; i <rows; i++){
-        for(int  j = 0 ; j<cols ; j++){
+        for(int  j = 0; j<cols; j++){
                 at(i,j) = mat.at(i,j);
             }
         }
@@ -175,8 +175,7 @@ matrix<DataType>::matrix(int  r,int  c , DataType*arr,int  size){
         row_start=NULL ;
         pindex=NULL ;
         acutal_size= r*c;
-        matrix_type= general ;
-        set_at_ptr(general) ;
+        set_feature(general) ;
         is_compressed= false;
         empty_vec[0] =  0;
             for(int  i =0 ;i<rows; i++){
@@ -263,6 +262,52 @@ void matrix<DataType>:: set_at_ptr(int  matrix_t){
 }
 
 
+template<typename DataType>
+void matrix<DataType>:: set_start_end_ptr(int  matrix_t){
+    switch(matrix_t){
+        case symmetric :{
+            start_ptr  = start_symmetric;
+            end_ptr= end_symmetric ;
+        }break ;
+        case diagonal :{
+            start_ptr  = start_diagonal;
+            end_ptr= end_diagonal ;
+        }break ;
+
+        case utri :{
+             start_ptr= start_utri;
+             end_ptr= end_utri ;
+        }break;
+        case ltri :{
+             start_ptr= start_ltri;
+             end_ptr= end_ltri ;
+        }break;
+        case general :{
+              start_ptr= start_general;
+            end_ptr= end_general ;
+        }break ;
+        case orthonormal :{
+            start_ptr  = start_general;
+            end_ptr= end_general ;
+        }break ;
+       case anti_symmetric :{
+            start_ptr  = start_symmetric;
+            end_ptr= end_symmetric ;
+        }break ;
+        case iden :{
+             start_ptr= start_identity;
+             end_ptr= end_identity ;
+        }break;
+        case constant:{
+             start_ptr= start_constant;
+             end_ptr= end_constant ;
+        }break ;
+    default:{
+            start_ptr  = start_general;
+            end_ptr= end_general ;
+        }break;
+    }
+}
 
 template <typename DataType>
 bool matrix<DataType>::is_valid_index(int  row_i,int  col_i)const{
@@ -507,7 +552,7 @@ DataType matrix<DataType>::axpy(DataType alpha,const matrix&y)const{
     if(y.vec&&same_shape(y)){
         DataType res = 0;
          for(int  i = 0 ;i <rows;i++){
-            for(int  j = 0 ; j<cols;j++){
+            for(int  j = max(start(i),y.start(i)); j<min(end(i),y.end(i));j++){
                 res+=alpha*at(i,j)+y.at(i,j) ;
             }
         }
@@ -536,7 +581,7 @@ void matrix<DataType>:: set_identity(){
         }
     }
     else{
-    cout<<square_error;
+        cout<<square_error;
     }
 }
 template <typename DataType>
@@ -620,7 +665,7 @@ matrix<DataType> matrix<DataType>::operator*(DataType scalar)const{
     if(vec){
         matrix<DataType>ret_mat(rows,cols)  ;
         for(int  i = 0 ;i<rows; i++){
-            for(int  j = 0 ; j<cols ;j++){
+            for(int  j = start(i) ; j<end(i) ;j++){
                 ret_mat.at(i,j)=at(i,j)*scalar ;
             }
         }
@@ -637,7 +682,7 @@ matrix<DataType> matrix<DataType>:: operator * (const matrix&mat)const{
         matrix<DataType>ret_mat(rows,mat.cols,0) ;
         for(int  row_counter=  0 ;  row_counter<rows; row_counter++){
             for(int  col_counter = 0  ; col_counter<mat.cols;col_counter++){
-                for(int  ele_counter = 0 ; ele_counter <cols;ele_counter++){
+                for(int  ele_counter = start(row_counter) ; ele_counter <end(row_counter);ele_counter++){
                     ret_mat.at(row_counter,col_counter)+= at(row_counter,ele_counter)*mat.at(ele_counter,col_counter);
                 }
             }
@@ -722,6 +767,7 @@ template <typename DataType>
 DataType matrix<DataType>::length(void) const {
     return norm2() ;
 }
+
 template <typename DataType>
 DataType matrix<DataType>::theta(matrix&mat) const {
     //a.b  =|a||b|costheta
@@ -782,7 +828,7 @@ bool matrix<DataType>::operator == (const matrix&mat)const{
 //helper function
 template <typename DataType>
 void matrix<DataType>::row_axpy(DataType scalar,int  upper_row,int  lower_row){
-    for(int  col_counter =0 ; col_counter<get_cols();col_counter++){
+    for(int  col_counter =start(lower_row) ; col_counter<end(lower_row);col_counter++){
         at(lower_row,col_counter)+= at(upper_row,col_counter)*scalar;
     }
 }
@@ -887,7 +933,7 @@ matrix<DataType> matrix<DataType>::gauss_up( matrix<int>*pivots_indices)const {
                 for(int  up_r = pivot_condition-1;up_r>=0;up_r--){
                     if(abs(ret_mat.at(up_r,pivot_index))>tolerance){
                         DataType c =(ret_mat.at(up_r,pivot_index)/ret_mat.at(pivot_condition,pivot_index))*DataType(-1);
-                            for(int  col_c = 0 ; col_c<cols; col_c++){
+                            for(int  col_c = pivot_index ; col_c>=0; col_c--){
                                 ret_mat.at(up_r,col_c)+= c*ret_mat.at(pivot_condition,col_c);
 
                         }
@@ -1103,7 +1149,7 @@ void matrix<DataType>::operator=(const matrix<DataType>&mat){
          }
         //copying mechanism
         for(int  i = 0 ; i <rows;i++){
-            for(int  j= 0 ; j<cols ;j++){
+            for(int  j= mat.start(i) ; j<mat.end(i) ;j++){
                 at(i,j) = mat.at(i,j) ;
             }
         }
@@ -1417,12 +1463,12 @@ int matrix<DataType>:: is_pivot_up(int  r_ind , int  c_ind) {
             if(pivot_index!=-1){
                 for(int  up_r = low_r-1;up_r>=0;up_r--){
                     DataType c =(ret_mat.at(up_r,pivot_index) /ret_mat.at(low_r,pivot_index)) *DataType(-1)  ;
-                    for(int  col_c = 0 ; col_c<cols ; col_c++){
+                    for(int  col_c = ret_mat.start(low_r) ; col_c<ret_mat.end(low_r)  ; col_c++){
                         ret_mat.at(up_r,col_c)+= c*ret_mat.at(low_r,col_c);
+                    }
                 }
-            }
-       }
-    }
+           }
+        }
         //go in each row and if that row contains a pivot divid each element by
         //by the pivot
         for(int  i = 0 ; i<rows;i++){
@@ -1430,7 +1476,7 @@ int matrix<DataType>:: is_pivot_up(int  r_ind , int  c_ind) {
             if(pivot_index!=-1){
                 DataType val = ret_mat.at(i,pivot_index);
                 if(abs(val)>tolerance){
-                    for(int  j=  0 ; j<cols;j++){
+                    for(int  j=  start(i) ; j<end(i);j++){
                         ret_mat.at(i,j)/=val ;
                         //tolerance
                     }
@@ -2598,6 +2644,7 @@ void matrix<DataType> ::compress(void){
             case diagonal :
                 compress_diagonal() ;break;
         }
+        set_feature(matrix_type) ;
     }
 
 
@@ -2753,6 +2800,89 @@ void matrix<DataType> ::compress(void){
             vec=new_vec;
             set_at_ptr(general);
         }
+    }
+
+    template<typename DataType>
+    int matrix<DataType>::start_general(int row_i )const{
+        return 0 ;
+    }
+    template<typename DataType>
+    int matrix<DataType>::end_general(int row_i )const{
+        return cols;
+    }
+
+    template<typename DataType>
+    int matrix<DataType>::start_constant(int row_i )const{
+        return 0 ;
+    }
+    template<typename DataType>
+    int matrix<DataType>::end_constant(int row_i )const{
+        return cols;
+    }
+
+    template<typename DataType>
+    int matrix<DataType>::start_utri(int row_i)const {
+        if(pindex[row_i]!=-1){
+            return pindex[row_i] ;
+        }
+        return cols;
+    }
+    template<typename DataType>
+    int matrix<DataType>::end_utri(int row_i) const{
+        return cols;
+    }
+    template<typename DataType>
+    int matrix<DataType>::start_ltri(int row_i)const {
+        return 0;
+    }
+    template<typename DataType>
+    int matrix<DataType>::end_ltri(int row_i)const{
+        if(pindex[row_i]!=-1){
+            return pindex[row_i]+1;
+        }
+        return 0 ;
+    }
+    template<typename DataType>
+    int matrix<DataType>::start_diagonal(int row_i)const{
+        return row_i ;
+    }
+    template<typename DataType>
+    int matrix<DataType>::end_diagonal(int row_i)const {
+        return row_i+1;
+    }
+
+    template<typename DataType>
+    int matrix<DataType>::start_identity(int row_i) const{
+        return row_i ;
+    }
+    template<typename DataType>
+    int matrix<DataType>::end_identity(int row_i)const{
+        return row_i+1;
+    }
+    template<typename DataType>
+    int matrix<DataType>::start_symmetric(int row_i)const {
+        return 0 ;
+    }
+    template<typename DataType>
+    int matrix<DataType>:: end_symmetric(int row_i)const{
+        return cols ;
+    }
+    template<typename DataType>
+    int matrix<DataType>::start_anti_symmetric(int row_i) const{
+        return 0 ;
+    }
+    template<typename DataType>
+    int matrix<DataType>::end_anti_symmetric(int row_i)const {
+        return cols;
+    }
+    template<typename DataType>
+
+    int matrix<DataType>::start(int row_i)const{
+        return (this->*start_ptr)(row_i);
+    }
+    template<typename DataType>
+    int matrix<DataType>::end(int row_i)const{
+        return (this->*end_ptr)(row_i);
     }
 
 
