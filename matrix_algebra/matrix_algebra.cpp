@@ -2714,6 +2714,14 @@ void matrix<DataType> ::compress(void){
         for(int  i =0 ; i<7;i++){
            features_arr[i]=true;
         }
+        if(!is_square()){
+            features_arr[iden-1]=0;
+            features_arr[symmetric-1]=0;
+            features_arr[anti_symmetric-1]=0;
+            features_arr[symmetric-1]=0;
+            features_arr[diagonal-1]=0;
+            features_arr[constant-1]=0;
+        }
         //used to save processing time if 4 features realated to
         //the upper part of the matrix then cut the search at this area
         DataType val = at(0,0) ;
