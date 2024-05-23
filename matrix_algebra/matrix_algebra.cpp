@@ -836,7 +836,7 @@ void matrix<DataType>::row_axpy(DataType scalar,int  upper_row,int  lower_row){
 //optional if you want to know the indices of the pivots for each row
 //pass in a matrix<DataType>aka pivots_indices
 template <typename DataType>
-matrix<DataType> matrix<DataType>::gauss_down( matrix<int >*pivots_indices,int  pivots_locations) const {
+matrix<DataType> matrix<DataType>::gauss_down( matrix<int>*pivots_indices,int  pivots_locations) const {
     if(matrix_type!=utri){
         matrix<DataType>ret_mat = *this;
         //make a separate vector for compression of already
@@ -848,7 +848,7 @@ matrix<DataType> matrix<DataType>::gauss_down( matrix<int >*pivots_indices,int  
             else{
                 //here it will be permutaions matrix
                 //to record each row exchange happening
-                *pivots_indices = matrix<int >(rows,1);
+                *pivots_indices = matrix<int>(rows,1);
                 for(int  i= 0 ; i<pivots_indices->get_rows();i++){
                     pivots_indices->at(i,0) = i;
                 }
@@ -897,6 +897,9 @@ matrix<DataType> matrix<DataType>::gauss_down( matrix<int >*pivots_indices,int  
         }
         ret_mat.compress();
         return ret_mat;
+    }
+    if(pivots_indices!=NULL){
+        *pivots_indices=matrix<int>(rows,1,pindex,rows);
     }
     matrix<DataType> ret_mat = *this;
     ret_mat.compress()  ;
@@ -947,6 +950,9 @@ matrix<DataType> matrix<DataType>::gauss_up( matrix<int>*pivots_indices)const {
         return ret_mat;
     }
     matrix<DataType>ret_mat = *this;
+    if(pivots_indices!=NULL){
+        *pivots_indices=matrix<int>(rows,1,pindex,rows);
+    }
     ret_mat.compress()  ;
     return ret_mat ;
 }
@@ -1454,9 +1460,8 @@ int matrix<DataType>:: is_pivot_up(int  r_ind , int  c_ind) {
         //it will have the value 1 in that row and so on
         //return matrix
         //do gaussian elemination downward
-        matrix<int >pivots_locations;
+        matrix<int>pivots_locations;
         matrix<DataType>ret_mat = gauss_down(&pivots_locations);
-
         //do gaussian elimination upward using the pivots_locations
         for(int  low_r = rows-1 ; low_r>0;low_r--){
             int  pivot_index = pivots_locations.at(low_r,0);
@@ -1490,7 +1495,8 @@ int matrix<DataType>:: is_pivot_up(int  r_ind , int  c_ind) {
         if(pivots_indices){
             *pivots_indices = pivots_locations ;
         }
-       return ret_mat ;
+        ret_mat.compress();
+        return ret_mat ;
     }
     //checks if a set of vectors in a column space are independent
     template <typename DataType>
@@ -2718,7 +2724,6 @@ void matrix<DataType> ::compress(void){
             features_arr[iden-1]=0;
             features_arr[symmetric-1]=0;
             features_arr[anti_symmetric-1]=0;
-            features_arr[symmetric-1]=0;
             features_arr[diagonal-1]=0;
             features_arr[constant-1]=0;
         }
@@ -2892,6 +2897,5 @@ void matrix<DataType> ::compress(void){
     int matrix<DataType>::end(int row_i)const{
         return (this->*end_ptr)(row_i);
     }
-
 
 
