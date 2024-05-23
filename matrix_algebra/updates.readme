@@ -1,3 +1,6 @@
+5/23/2024 update:
+fixed a bug that caused fill_features to seg-fault if the passed matrix isn't a square matrix
+it was an indexing error :)
 5/20/2024 update:
 added     int start_general(int row_i )const;
     int end_general(int row_i )const;
