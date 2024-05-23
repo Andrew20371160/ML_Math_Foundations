@@ -1209,7 +1209,7 @@ template <typename DataType>
 
 bool matrix<DataType>::is_upper_tri(void)const  {
         for(int  i =0 ; i <rows;i++){
-            for(int  j=  0 ; j<i; j++){
+            for(int  j=  0 ; j<i&&j<get_cols(); j++){
                     if(abs(at(i,j))>check_tolerance){
                         return false ;
 
@@ -1223,7 +1223,7 @@ template <typename DataType>
 
 bool matrix<DataType>::is_lower_tri()const {
     for(int  i =0 ; i <rows;i++){
-        for(int  j=  i+1 ; j<rows; j++){
+        for(int  j=  i+1 ;j<get_cols(); j++){
                 if(abs(at(i,j))>check_tolerance){
                     return false ;
                 }
