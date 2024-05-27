@@ -2430,7 +2430,7 @@ i've noticed it produces wrong answers due to those 2 problems when testing the 
 
 
 //here is the compression algorithm for each matrix type
-//they are private so the public one is compress(int  matrix type)
+//they are private so the public one is compress(void)
 //here row_start is filled and pindex aswell
 //passed function must be one of those types with zeroes
 template<typename DataType>
