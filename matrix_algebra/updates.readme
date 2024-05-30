@@ -1,3 +1,5 @@
+5/30/2024 update:
+fixed an issue where fill_features didn't set the matrix type as utri if the matrix was square 
 5/23/2024 update:
 fixed a bug that caused fill_features to seg-fault if the passed matrix isn't a square matrix
 it was an indexing error :)
