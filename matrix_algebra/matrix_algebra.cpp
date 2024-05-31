@@ -1639,7 +1639,7 @@ int matrix<DataType>:: is_pivot_up(int  r_ind , int  c_ind) {
             int  pivot_index = pivots_indices.at(low_r,0);
             if(pivot_index!=-1){
                 for(int  up_r = low_r-1;up_r>=0;up_r--){
-                    DataType c = -1 * (mat_cpy.at(up_r,pivot_index) /mat_cpy.at(low_r,pivot_index));
+                    DataType c = (mat_cpy.at(up_r,pivot_index) /mat_cpy.at(low_r,pivot_index))*DataType(-1);
                     for(int  col_c = cols-1 ; col_c>=pivot_index; col_c--){
                         mat_cpy.at(up_r,col_c)+=c*mat_cpy.at(low_r,col_c) ;
                     }
@@ -1657,7 +1657,7 @@ int matrix<DataType>:: is_pivot_up(int  r_ind , int  c_ind) {
             //if the following row contains a pivot then we divide the whole row by that pivot
             if(pivot_index!=-1){
                 DataType val = mat_cpy.at(pivot_c,pivot_index);
-                if(val){
+                if(abs(val)>check_tolerance){
                     //do that for each element in the row
                     for(int  j=  0 ; j<rows;j++){
                         elementary.at(pivot_c,j)/=val ;
@@ -2899,6 +2899,3 @@ void matrix<DataType> ::compress(void){
     int matrix<DataType>::end(int row_i)const{
         return (this->*end_ptr)(row_i);
     }
-
-
-
