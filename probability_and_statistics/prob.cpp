@@ -472,7 +472,7 @@ then insert them
                         remove(arr[j]);
                         j++;
                     }
-                    i =j ;
+                    i =j-1;
                 }
             }
             delete[]arr;
