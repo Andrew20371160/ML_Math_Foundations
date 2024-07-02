@@ -455,10 +455,10 @@
 
     //deletes a node from a bst
     template <typename DataType>//no recursion
-    bool bst<DataType>::remove(const DataType&data){
+    bool bst<DataType>::remove(const DataType&data,node<DataType>*ptr){
         if(root){
             //if data exists traverser sits on it now
-            if(search(data)){
+            if(search(data,ptr)){
                 size--;//decrement if data is found
                 //leaf node condition
                 if(traverser->left==NULL&&traverser->right==NULL){
@@ -473,7 +473,6 @@
                         delete traverser ;
                         traverser = NULL;
                     }
-
                 }
                 //no right child condition
                 else if(traverser->right==NULL){
@@ -508,7 +507,7 @@
                     //the temp_ptr is assigned the value
                     DataType temp_data=temp->data;
                     node<DataType>*temp_ptr= traverser;
-                    remove(temp_data);
+                    remove(temp_data,temp);
                     temp_ptr->data=temp_data ;
                 }
                 traverser=root;
