@@ -365,8 +365,8 @@
     //this function puts traverser pointer on the node containing data if found
     //and returns true
     template <typename DataType>    //no recursion
-    bool bst<DataType>::search(const DataType&_data)const{
-         traverser=root;
+    bool bst<DataType>::search(const DataType&_data,node<DataType>*ptr)const{
+         traverser=(ptr==NULL)?root:ptr;
          if(traverser==NULL){
              return 0 ;
          }
@@ -394,6 +394,7 @@
             }
         }
     }
+
 
     /*
     next set of functions are used in deletion of a node in a bst
