@@ -1,3 +1,7 @@
+7/2/2024 update :
+fixed a bug that caused an open-loop when removing duplicates from a the set
+now remove duplicates works fine 
+
 6/29/2024 update:
 -fixed a bug in remove duplicates
 6/25/2024 update :
