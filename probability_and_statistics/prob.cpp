@@ -128,7 +128,7 @@ then insert them
 
     template<typename DataType>
     bool set<DataType>::search(const DataType&data)const {
-        return search(data) ;
+        return tree.search(data) ;
     }
     //remove an element from the set
     template<typename DataType>
