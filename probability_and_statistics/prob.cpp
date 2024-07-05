@@ -389,6 +389,19 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
          return 1 ;
     }
 
+    template<typename DataType>
+    bool set<DataType>::count_for_var( const node<DataType>*ptr,const bst<DataType>&other_tree,long long &counter,const node<DataType>**match_vec)const{
+         counter+=ptr->data*ptr->data*ptr->counter;
+         return 1 ;
+    }
+
+    template<typename DataType>
+    bool set<DataType>::count_for_var( node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec){
+         counter+=ptr->data*ptr->data*ptr->counter;
+         return 1 ;
+    }
+
+
 
     template<typename DataType>
     bool set<DataType>::exist( node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec){
@@ -845,6 +858,36 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
         return 0  ;
     }
 
+
+    template<typename DataType>
+    double set<DataType>::variance(void)const {
+        long long counter= 0 ;
+        if(size()){
+            set_function_ptr(count_for_var);
+            euler_tour(NULL,tree,NULL,counter) ;
+            return static_cast<double>(counter)/static_cast<double>(size())-pow(average(),2);
+        }
+        return 0  ;
+    }
+
+    template<typename DataType>
+    double set<DataType>::standard_deviation(void)const {
+        long long counter= 0 ;
+        if(size()){
+            return sqrt(variance())  ;
+        }
+        return 0  ;
+    }
+    template<typename DataType>
+    DataType set<DataType>::range(void)const {
+        if(size()){
+            return tree.get_max(tree.root)->data-tree.get_min(tree.root)->data ;
+        }
+        cout<<"can't have range for an empty set(Garbage value)" ;
+        DataType garbage_value ;
+        return garbage_value ;
+    }
+
     template<typename DataType>
     double set<DataType>::average(const double*weights,const int &weights_size)const {
 
@@ -1207,5 +1250,4 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
 
 int main(){
 
-return 0 ;
 }
