@@ -15,6 +15,7 @@
     string to_string(const int &data){
         return std::to_string(data);
     }
+
     string to_string(const unsigned int&data){
         return std::to_string(static_cast<int>(data));
     }
@@ -66,7 +67,9 @@
             if (ptr->left) {
                 to_string(str, ptr->left);
             }
-            str.append(::to_string(ptr->data)+',');
+            for(int i = 0 ;i <ptr->counter; i++)
+                str.append(::to_string(ptr->data)+',');
+
             if (ptr->right) {
                 to_string(str, ptr->right);
             }
@@ -75,11 +78,13 @@
 
     //helper function to allocate memory for a new node
     template <typename DataType>
-    node<DataType>*bst<DataType>::get_node(const DataType & _data){
+    node<DataType>*bst<DataType>::get_node(const DataType & _data,const int&counter){
 
         node<DataType>*new_node=new node<DataType> ;
 
         new_node->data =_data ;
+        //bst now can hold multiple instances of same element
+        new_node->counter= counter;
 
         new_node->left = NULL;
         new_node->right = NULL;
@@ -93,20 +98,85 @@
     bst<DataType>::bst(void){
         root = NULL ;
         traverser= NULL ;
+        nodes_count  =0 ;
         size=0;
     }
+
+    template<typename DataType>
+    long long  bst<DataType>::get_nodes_count()const{
+        return nodes_count ;
+    }
+
+    template<typename DataType>
+    bst<DataType>::bst(const node<DataType>**arr,const long long _size){
+
+        nodes_count = _size ;
+        root =NULL;
+        size = 0;
+        if(_size>0){
+            for(int i = 0 ; i <_size;i++){
+                size += arr[i]->counter;
+            }
+            root = fill_sorted(arr, 0, nodes_count-1,root);
+            root->parent = NULL;
+        }
+    }
+
     //tree filled from an array
     //if data is sorted its filled in O(N) else O(Nlog2N)
     //note if data is sorted and there are duplicates they aren't deleted
     template <typename DataType>
     bst<DataType>::bst(const DataType* arr, const long long _size) {
+
+        nodes_count = 0  ;
         size = 0;
+
         root = NULL ;
         traverser=NULL;
 
         if (is_sorted(arr,_size)) {
+            //count unique elements
+            long long unique_counter = 1 ;
+            for(long long i = 1; i<_size;i++){
+                if(arr[i]!=arr[i-1]){
+                    unique_counter++;
+                }
+            }
+
+            nodes_count = unique_counter ;
+
+            //collect unique elements
+            long long counter = 1;
+            DataType *unique_arr = new DataType[unique_counter] ;
+            unique_arr[0] =arr[0] ;
+
+            for(long long i = 1; i<_size;i++){
+                if(arr[i]!=arr[i-1]){
+                    unique_arr[counter] = arr[i] ;
+                    counter++ ;
+                }
+            }
+            //fill the bst with the unique sorted elements
+            root = fill_sorted(unique_arr, 0, unique_counter-1,root);
+
+            //delete the allocated memory
+            delete[]unique_arr ;
+            unique_arr= NULL ;
+            //add rest of the duplicates
+            for(long long i = 1; i<_size;i++){
+                //1 1 1 2 2 3 4 5 5 5 6
+                //unique element already exists we are interested in the duplicates
+                if(arr[i]==arr[i-1]){
+                    int j=i;
+                    while(j<_size&&arr[j]==arr[j-1]){
+                        insert(arr[j]);
+                        j++;
+                    }
+                    i= j ;
+                }
+            }
             size =_size;
-            root = fill_sorted(arr, 0, size-1,root);
+
             root->parent = NULL;
         }
         else {
@@ -123,6 +193,7 @@
     bst<DataType>::bst(const bst<DataType>& src) {
         root = copy_bst(src.root);
         size = src.size;
+        nodes_count = src.nodes_count ;
     }
 
     template <typename DataType>
@@ -134,7 +205,9 @@
             }
             root=copy_bst(src.root) ;
             size= src.size;
+            nodes_count = src.nodes_count ;
         }
+        //if src is empty then the phantom tree is deleted aswell
         else{
             del_tree(root) ;
             root =NULL;
@@ -145,12 +218,54 @@
     //if data is sorted its filled in O(N) else O(Nlog2N)
     template<typename DataType>
     bst<DataType>::bst(const vector<DataType>&arr) {
+        nodes_count = 0  ;
         size = 0;
+
         root = NULL ;
         traverser=NULL;
-        if (is_sorted(arr)){
+
+        if (is_sorted(arr,arr.size())) {
+            //count unique elements
+            long long unique_counter = 1 ;
+            for(long long i = 1; i<arr.size();i++){
+                if(arr[i]!=arr[i-1]){
+                    unique_counter++;
+                }
+            }
+
+            nodes_count = unique_counter ;
+
+            //collect unique elements
+            long long counter = 1;
+            DataType *unique_arr = new DataType[unique_counter] ;
+            unique_arr[0] =arr[0] ;
+
+            for(long long i = 1; i<arr.size();i++){
+                if(arr[i]!=arr[i-1]){
+                    unique_arr[counter] = arr[i] ;
+                    counter++ ;
+                }
+            }
+
+            root = fill_sorted(unique_arr, 0, unique_counter-1,root);
+
+            //delete the allocated memory
+            delete[]unique_arr ;
+            unique_arr= NULL ;
+
+            for(long long i = 1; i<arr.size();i++){
+                //1 1 1 2 2 3 4 5 5 5 6
+                if(arr[i]==arr[i-1]){
+                    int j=i;
+                    while(j<arr.size()&&arr[j]==arr[j-1]){
+                        insert(arr[j]);
+                        j++;
+                    }
+                    i= j ;
+                }
+            }
             size =arr.size();
-            root = fill_sorted(arr, 0, size-1,root);
+
             root->parent = NULL;
         }
         else {
@@ -167,9 +282,11 @@
     bst<DataType>::~bst() {
         del_tree(root);
         root = NULL;
+        nodes_count  = 0  ;
         traverser=NULL;
         size = 0;
     }
+
     //functions that remove the whole tree or a subtree
    template <typename DataType>//removes the whole bst
     bool bst<DataType>:: remove_tree(void){
@@ -178,11 +295,13 @@
             root =NULL;
             traverser=NULL;
             size = 0 ;
+            nodes_count = 0 ;
 
         return 1;
      }
      return 0;
     }
+
     //remove the subtree beneath root containing data
     template <typename DataType>
     bool bst<DataType>:: remove_subtree(const DataType&data){
@@ -194,6 +313,7 @@
          }
          return 0 ;
     }
+
     //checks if data in an array is sorted
     template <typename DataType>
     bool bst<DataType>::is_sorted(const DataType*arr,long long _size){
@@ -217,7 +337,7 @@
             return 1 ;
         }
 
-        template <typename DataType>
+    template <typename DataType>
     node<DataType>*bst<DataType>::fill_sorted(const vector<DataType>&arr,long long beg,long long end,node<DataType>*ptr){
         if(ptr==NULL){
            if(beg<=end){
@@ -243,7 +363,38 @@
         return NULL ;
 
     }//passed
+    /*
+    recursively construct a bst in O(N) from an already existing nodes in another or different bsts
+    since in the set class the array is filled using euler tour the data in the pointers are sorted
+    so no need to insert each individual element
+    */
+    template <typename DataType>
+    node<DataType>*bst<DataType>::fill_sorted(const node<DataType>**arr,long long beg,long long end,node<DataType>*ptr){
+        if(ptr==NULL){
+           if(beg<=end){
+                long long mid =(end-beg)/2+beg;
+                //allocate memeory using data and counter of the already existing pointer
+                ptr = get_node(arr[mid]->data,arr[mid]->counter) ;
 
+                ptr->left = fill_sorted(arr,beg,mid-1,ptr->left) ;
+
+                if(ptr->left){
+                    ptr->left->parent=ptr;
+                }
+                ptr->right=fill_sorted(arr,mid+1,end,ptr->right);
+
+                if(ptr->right){
+                    ptr->right->parent=ptr;
+                }
+
+                return ptr ;
+            }
+            else{
+                return NULL;
+            }
+        }
+        return NULL ;
+    }
 
     /*
     these functions fill a bst from sorted data in linear time (O(N))
@@ -292,6 +443,7 @@
             }
 
             long long counter =1 ;
+
             while(!q.empty()){
                 node<DataType>*temp= q.front() ;
                 q.pop() ;
@@ -306,6 +458,8 @@
                 }
 
                 if(temp){
+                    size-=temp->counter ;
+
                     delete temp;
                     temp=NULL;
                 }
@@ -314,36 +468,43 @@
                root=NULL;
             }
             ptr=NULL;
-            size-=counter;
+            nodes_count-=counter;
         }
     }
 
 
 
-    //data inserted must have the id or the feature of comparison not repeated
-    //ex: id of a person...etc
+
     //no recursion
     template <typename DataType>
-    bool bst<DataType>::insert(const DataType&_data){
+    bool bst<DataType>::insert(const DataType&_data,const int &count){
         node<DataType>*ptr= root;
         if(root==NULL){
-            root=get_node(_data);
-            size=1;
+            root=get_node(_data,count);
+            size=count;
+            nodes_count =1 ;
             return 1 ;
         }
         else{
-            size++;
+            //nodes count incremented assuming its a unique element
+            nodes_count++;
+            //size is always incremented by the count of the newly inserted data
+            size+=count;
             while(1){
                 if(_data==ptr->data){
-                    size--;
-                    return 0  ;
+                    //if data already exists increase the node counter and decrease nodes_count
+                    ptr->counter+=count;
+
+                    nodes_count--;
+
+                    return 1  ;
                 }
                 else if(_data<ptr->data){
                     if(ptr->left){
                         ptr=ptr->left;
                     }
                     else{
-                        ptr->left= get_node(_data) ;
+                        ptr->left= get_node(_data,count) ;
                         ptr->left->parent=ptr;
                         return 1  ;
                     }
@@ -353,7 +514,7 @@
                         ptr=ptr->right;
                     }
                     else{
-                        ptr->right= get_node(_data) ;
+                        ptr->right= get_node(_data,count) ;
                         ptr->right->parent=ptr;
                         return 1  ;
                     }
@@ -457,10 +618,13 @@
     //deletes a node from a bst
     template <typename DataType>//no recursion
     bool bst<DataType>::remove(const DataType&data,node<DataType>*ptr){
+
         if(root){
             //if data exists traverser sits on it now
             if(search(data,ptr)){
-                size--;//decrement if data is found
+                size-=traverser->counter;
+                nodes_count-- ; //decrement if data is found
+
                 //leaf node condition
                 if(traverser->left==NULL&&traverser->right==NULL){
                     if(is_root(traverser)){
@@ -507,9 +671,19 @@
                     //so that after removing temp data
                     //the temp_ptr is assigned the value
                     DataType temp_data=temp->data;
+
+                    int temp_counter = temp->counter ;
+
                     node<DataType>*temp_ptr= traverser;
+
                     remove(temp_data,temp);
+
                     temp_ptr->data=temp_data ;
+
+                    temp_ptr->counter = temp_counter ;
+
+                    size+=temp_counter ;
+                    nodes_count++;
                 }
                 traverser=root;
                 return 1 ;
@@ -525,11 +699,15 @@
     template <typename DataType>    //no recursion
     node<DataType>*bst<DataType>::copy_bst(const node<DataType>* ptr) {
         if (ptr) {
-            node<DataType>* new_root = get_node(ptr->data);
+            node<DataType>* new_root = get_node(ptr->data,ptr->counter);
             queue<const node<DataType>*> src;
 
             queue<node<DataType>*> dest;
-            size = 1 ;
+
+            size = new_root->counter ;
+
+            nodes_count = 1;
+
             src.push(ptr);
             dest.push(new_root);
 
@@ -542,19 +720,21 @@
                 dest.pop();
 
                 if (src_node->left) {
-                    dest_node->left = get_node(src_node->left->data);
+                    dest_node->left = get_node(src_node->left->data,src_node->left->counter);
                     dest_node->left->parent = dest_node;
                     src.push(src_node->left);
                     dest.push(dest_node->left);
-                    size++;
+                    nodes_count++;
+                    size+=dest_node->left->counter ;
                 }
 
                 if (src_node->right) {
-                    dest_node->right = get_node(src_node->right->data);
+                    dest_node->right = get_node(src_node->right->data,src_node->right->counter);
                     dest_node->right->parent = dest_node;
                     src.push(src_node->right);
                     dest.push(dest_node->right);
-                    size++;
+                    size+=dest_node->right->counter ;
+                    nodes_count++;
                     }
                 }
                 return new_root;
@@ -794,6 +974,7 @@
     long long  bst<DataType>::get_size(void)const{
         return size;
     }
+
     template<typename DataType>
     DataType bst<DataType>:: access_traverser(void){
         DataType data ;
@@ -802,5 +983,3 @@
         }
         return data;
     }
-
-
