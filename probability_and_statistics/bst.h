@@ -1,3 +1,4 @@
+
 #ifndef _bst_h_
 #define _bst_h_
 
@@ -11,11 +12,6 @@
 #include <vector>
 #include <sstream>
 
-//used these in testing you can delete these if you want
-#include <chrono>
-#include <thread>
-#include <random>
-
 
 
 using namespace std ;
@@ -24,7 +20,12 @@ using namespace std ;
 //node structure conataining template data type
 template <typename DataType>
 struct node{
+    //element of the set
     DataType data ;
+    //counter for number of occrrunces of the element
+    //the elements are stored with no duplicates but the counter stores their count efficiently
+    int counter ;
+    //links
     node<DataType>*left;
     node<DataType>*right ;
     node<DataType>*parent ;
@@ -57,7 +58,11 @@ struct node{
 
 enum {not_sorted=0,sorted} ;
 
-
+/*
+The bst is modified to allow multiple instances of the same element
+the problem where if an array is inserted immediately using a constructor where elements of the array are sorted
+are now handled in the new array constructor
+*/
 //class bst
 template<typename DataType>
 class bst{
@@ -71,6 +76,9 @@ class bst{
     mutable node<DataType>*traverser;
 
     //number of nodes inside the tree
+    long long nodes_count ;
+    //total number of elements
+    //number of occurrences of each element is countet aswell
     long long size ;
 
     /*
@@ -78,7 +86,8 @@ class bst{
     */
 
     //helper function to allocate memory for a new node
-    node<DataType>*get_node(const DataType& _data);//passed
+    //by default the number of instances of the element (data) is one
+    node<DataType>*get_node(const DataType& _data,const int &counter = 1);//passed
 
 
     //checks if ptr is left or right child or is the root
@@ -113,6 +122,10 @@ class bst{
     */
     node<DataType>*fill_sorted(const DataType*arr,long long  beg,long long  size,node<DataType>*ptr);//passed
     node<DataType>*fill_sorted(const vector<DataType>&arr,long long  beg,long long  size,node<DataType>*ptr);//passed
+    //this function is used to construct a bst from sorted array of pointers pointers to nodes
+    //the array contains addresses of nodes of a bst that's already created
+    //used a lot in set class
+    node<DataType>*fill_sorted(const node<DataType>**arr,long long  beg,long long  size,node<DataType>*ptr);//passed
 
 public:
     //empty tree
@@ -120,6 +133,10 @@ public:
     //tree filled from an array
     //if data is sorted its filled in O(N) else O(Nlog2N)
     bst(const DataType*arr,const long long  size);//passed
+    //filles a sorted array of pointers to nodes of already constructed bst
+    //used to efficiently construct a new set from an already existing set
+    //it's clean and i'm proud :)
+    bst(const node<DataType>**arr,const long long  size);//passed
 
     //tree filled from an array
     //if data is sorted its filled in O(N) else O(Nlog2N)
@@ -144,12 +161,11 @@ public:
     bool is_sorted(const vector<DataType>&arr);
 
     //inserts data into the bst
-    //data isn't inserted if the unique value is repeated
-    //check documentation below the class of the necessary operations you must include in your object
-    //so that this bst works
-    bool insert(const DataType&data) ;//passed
+    //can insert with duplicates (all stored in same node using a counter)
+    bool insert(const DataType&data,const int &count=1) ;//passed
     //this function puts traverser on the node containing data if found
     //and returns true
+
     bool search(const DataType&data,node<DataType>*ptr=NULL)const  ;//passed
     //this function removes node contatining data if found
     //returns true if node is found
@@ -190,8 +206,10 @@ public:
     //moves traverser in the tree via a set of controls
     void move(void)const ;//passed
 
-    //returns number of elements stored in the tree
+    //returns total number of elements
     long long  get_size()const;
+    //returns number of unique (nodes) elements in the tree
+    long long  get_nodes_count()const;
 
     DataType access_traverser(void) ;
 };
