@@ -1,4 +1,42 @@
     #include "prob.h"
+
+
+    template<typename T>
+    std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
+        os << "[";
+        if (!vec.empty()) {
+            os << vec[0];
+            for (int i = 1; i < vec.size(); i++)
+                os << ", " << vec[i];
+        }
+        os << "]";
+        return os;
+    }
+
+    long long factorial(const int &num){
+        long long res = 1 ;
+        for(int i = 0  ; i<num;i++){
+            res*=(num-i);
+        }
+        return res  ;
+    }
+
+    int choose(const int&n,const int&k){
+        if(n>=k)
+            return factorial(n)/(factorial(n-k)*factorial(k)) ;
+        return 0;
+    }
+
+
+template<typename DataType>
+void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)(const node<DataType>*ptr,const bst<DataType>&,long long &, const node<DataType>**)const)const{
+    func_ptr_c = ptr ;
+}
+
+template<typename DataType>
+void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*ptr, bst<DataType>&,long long &, node<DataType>**)){
+    func_ptr = ptr ;
+}
     /*
     prints a set in a visible way->{1,5,53,56,155} or {} for empty sets
     */
@@ -26,16 +64,16 @@
         tree.to_string(str) ;
         return str  ;
     }
-/*
-in cin first you enter the size or number of elements you are  going to insert
-then insert them
-*/
+    /*
+    in cin first you enter the size or number of elements you are  going to insert
+    then insert them
+    */
     template<typename DataType>
     istream& operator>>(istream& is, set<DataType>& obj){
             int n;
             is>>n;
             DataType data ;
-            for(int j= 0 ;j<obj.get_size();j++){
+            for(int j= 0 ;j<obj.size();j++){
                 is>>data ;
                 obj.insert(data) ;
             }
@@ -82,6 +120,7 @@ then insert them
             tree = bst<DataType>() ;
         }
     }
+
     //copy constructor
     template<typename DataType>
     set<DataType>::set(const set&src){
@@ -100,8 +139,8 @@ then insert them
     }
     //insert an element into the set
     template<typename DataType>
-    bool set<DataType>::insert(DataType data){
-        return tree.insert(data) ;
+    bool set<DataType>::insert(DataType data,int count ){
+        return tree.insert(data,count) ;
     }
     //insert an array into the set
 
@@ -135,30 +174,237 @@ then insert them
     bool set<DataType>::remove(const DataType&data){
         return tree.remove(data) ;
      }
-     //get number of elements in the set
+
+    //get number of elements in the set
     template<typename DataType>
-    long long set<DataType>::get_size(void)const{
+    long long set<DataType>::size(void)const{
         return tree.get_size();
+    }
+
+    //get number of elements in the set
+    template<typename DataType>
+    long long set<DataType>::nodes_count(void)const{
+        return tree.get_nodes_count();
     }
 
     /*
     euler tour section
     */
     template<typename DataType>
-    bool exist(const DataType&data,const bst<DataType>&other_tree){
-        return other_tree.search(data) ;
+    bool set<DataType>::fill_for_intersection(const node<DataType>*ptr,const bst<DataType>&other_tree,long long &counter, const node<DataType>**match_vec)const{
+        if(other_tree.search(ptr->data)){
+            match_vec[counter] = (ptr->counter<=other_tree.traverser->counter)?ptr:other_tree.traverser ;
+            counter++;
+            return 1 ;
+        }
+        return 0 ;
     }
 
     template<typename DataType>
-    bool not_exist(const DataType&data,const bst<DataType>&other_tree){
-        return !other_tree.search(data) ;
+    bool set<DataType>::fill_for_intersection( node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec){
+        if(other_tree.search(ptr->data)){
+            match_vec[counter] = (ptr->counter<=other_tree.traverser->counter)?ptr:other_tree.traverser ;
+            counter++;
+            return 1 ;
+        }
+        return 0 ;
     }
 
     template<typename DataType>
-    bool always_exist(const DataType&data,const bst<DataType>&other_tree){
-        return 1;
+    bool set<DataType>::fill_for_union(const node<DataType>*ptr,const bst<DataType>&other_tree,long long &counter, const node<DataType>**match_vec)const{
+        if(!other_tree.search(ptr->data)){
+            match_vec[counter] = ptr;
+        }
+        else{
+            match_vec[counter] = (ptr->counter > other_tree.traverser->counter)?ptr:other_tree.traverser;
+        }
+        counter++;
+
+        return 1 ;
     }
 
+    template<typename DataType>
+    bool set<DataType>::fill_for_union( node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec){
+        if(!other_tree.search(ptr->data)){
+            match_vec[counter] = ptr;
+        }
+        else{
+            match_vec[counter] = (ptr->counter>other_tree.traverser->counter)?ptr:other_tree.traverser;
+        }
+        counter++;
+
+        return 1 ;
+    }
+
+    template<typename DataType>
+    bool set<DataType>::fill_for_unique(const node<DataType>*ptr,const bst<DataType>&other_tree,long long &counter, const node<DataType>**match_vec)const{
+        if(!other_tree.search(ptr->data)){
+            match_vec[counter] = ptr;
+            counter++;
+            return 1 ;
+        }
+        return 0 ;
+    }
+    template<typename DataType>
+    bool set<DataType>::fill_for_unique( node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec){
+        if(!other_tree.search(ptr->data)){
+            match_vec[counter] = ptr;
+            counter++;
+            return 1 ;
+        }
+        return 0 ;
+    }
+
+
+    template<typename DataType>
+    bool set<DataType>::fill_for_diff(const node<DataType>*ptr,const bst<DataType>&other_tree,long long &counter, const node<DataType>**match_vec)const{
+        if(!other_tree.search(ptr->data)){
+            match_vec[counter]= ptr ;
+            counter++ ;
+            return 1 ;
+        }
+        else{
+            //if data exists in both sets get difference from sample space
+            if(ptr->counter>other_tree.traverser->counter){
+                match_vec[counter] = ptr;
+                counter++;
+                return 1 ;
+            }
+        }
+        return 0 ;
+    }
+    template<typename DataType>
+    bool set<DataType>::count_for_intersection(const node<DataType>*ptr,const bst<DataType>&other_tree,long long &counter,const  node<DataType>**match_vec)const{
+         if(other_tree.search(ptr->data)){
+            counter +=min(other_tree.traverser->counter,ptr->counter);
+            return 1;
+         }
+         return 0;
+    }
+
+    template<typename DataType>
+    bool set<DataType>::count_for_draw_no_replace(const node<DataType>*ptr,const bst<DataType>&other_tree,long long &counter,const node<DataType>**match_vec)const{
+         if(other_tree.search(ptr->data)){
+            counter *= choose(other_tree.traverser->counter,ptr->counter);
+            return 1;
+         }
+         else{
+            counter =  0  ;
+         }
+         return 0;
+    }
+
+    template<typename DataType>
+    bool set<DataType>::count_for_draw_replace(const node<DataType>*ptr,const bst<DataType>&other_tree,long long &counter,const node<DataType>**match_vec)const{
+         if(other_tree.search(ptr->data)){
+            counter *= pow(other_tree.traverser->counter,ptr->counter);
+            return 1;
+         }
+         else{
+            counter =  0  ;
+         }
+         return 0;
+    }
+
+    template<typename DataType>
+    bool set<DataType>::count_for_draw_replace( node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec){
+         if(other_tree.search(ptr->data)){
+            counter *= pow(other_tree.traverser->counter,ptr->counter);
+            return 1;
+         }
+         else{
+            counter =  0  ;
+         }
+         return 0;
+    }
+    template<typename DataType>
+    bool set<DataType>::exist(const node<DataType>*ptr,const bst<DataType>&other_tree,long long &counter,const node<DataType>**match_vec)const{
+        return other_tree.search(ptr->data) ;
+    }
+
+    template<typename DataType>
+    bool set<DataType>::not_exist(const node<DataType>*ptr,const bst<DataType>&other_tree,long long &counter,const node<DataType>**match_vec)const{
+        return !other_tree.search(ptr->data) ;
+    }
+
+    template<typename DataType>
+    bool set<DataType>::always_exist(const node<DataType>*ptr,const bst<DataType>&other_tree,long long &counter,const node<DataType>**match_vec)const{
+         match_vec[counter] = ptr ;
+         counter++;
+         return 1 ;
+    }
+
+
+    template<typename DataType>
+    bool set<DataType>::fill_for_diff(node<DataType>*ptr, bst<DataType>&other_tree,long long &counter,node<DataType>**match_vec){
+        if(!other_tree.search(ptr->data)){
+            match_vec[counter]= ptr ;
+            counter++ ;
+            return 1 ;
+        }
+        else{
+            //if data exists in both sets get difference from sample space
+            if(ptr->counter>other_tree.traverser->counter){
+                match_vec[counter] = ptr;
+                counter++;
+                return 1 ;
+            }
+        }
+        return 0 ;
+    }
+
+    template<typename DataType>
+    bool set<DataType>::count_for_intersection( node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec){
+         if(other_tree.search(ptr->data)){
+            counter +=min(other_tree.traverser->counter,ptr->counter);
+            return 1;
+         }
+         return 0;
+    }
+
+    template<typename DataType>
+    bool set<DataType>::count_for_draw_no_replace( node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec){
+         if(other_tree.search(ptr->data)){
+            counter *= choose(other_tree.traverser->counter,ptr->counter);
+            return 1;
+         }
+         else{
+            counter =  0  ;
+         }
+         return 0;
+    }
+
+
+    template<typename DataType>
+    bool set<DataType>::count_for_avg( const node<DataType>*ptr,const bst<DataType>&other_tree,long long &counter,const node<DataType>**match_vec)const{
+         counter+=ptr->data*ptr->counter;
+         return 1 ;
+    }
+
+    template<typename DataType>
+    bool set<DataType>::count_for_avg( node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec){
+         counter+=ptr->data*ptr->counter;
+         return 1 ;
+    }
+
+
+    template<typename DataType>
+    bool set<DataType>::exist( node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec){
+        return other_tree.search(ptr->data) ;
+    }
+
+    template<typename DataType>
+    bool set<DataType>::not_exist( node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec){
+        return !other_tree.search(ptr->data) ;
+    }
+
+
+    template<typename DataType>
+    bool set<DataType>::always_exist( node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec){
+         match_vec[counter] = ptr ;
+         counter++;
+         return 1 ;
+    }
     /*
     this function fills vector/increase counter based on a conditino between phantom and caller
     if data in phantom exists in data in caller
@@ -169,25 +415,44 @@ then insert them
     using same logic this function can be used to calculate any property needed
     */
     template<typename DataType>
-    void set<DataType>::euler_tour(node<DataType>*ptr,const bst<DataType>&other_tree,
-        DataType*match_vec,long long &match_counter,bool (*func_ptr)(const DataType&,const bst<DataType>&))const{
+    void set<DataType>::euler_tour(const node<DataType>*ptr,const bst<DataType>&other_tree,
+     const node<DataType>**match_vec,long long &match_counter)const{
         if(ptr==NULL){
             ptr= tree.root ;
         }
         if(ptr){
             if(ptr->left){
-                euler_tour(ptr->left,other_tree,match_vec,match_counter,func_ptr) ;
+                euler_tour(ptr->left,other_tree,match_vec,match_counter) ;
             }
-            if(func_ptr(ptr->data,other_tree)){
-                 match_vec[match_counter]=ptr->data;
-                 match_counter++;
-            }
+
+            (this->*func_ptr_c)(ptr,other_tree,match_counter,match_vec);
+
             if(ptr->right){
-                euler_tour(ptr->right,other_tree,match_vec,match_counter,func_ptr) ;
+                euler_tour(ptr->right,other_tree,match_vec,match_counter) ;
             }
         }
     }
 
+    template<typename DataType>
+    void set<DataType>::euler_tour( node<DataType>*ptr, bst<DataType>&other_tree,
+      node<DataType>**match_vec,long long &match_counter){
+        if(ptr==NULL){
+            ptr= tree.root ;
+        }
+        if(ptr){
+            if(ptr->left){
+                euler_tour(ptr->left,other_tree,match_vec,match_counter) ;
+            }
+
+            (this->*func_ptr)(ptr,other_tree,match_counter,match_vec);
+
+            if(ptr->right){
+                euler_tour(ptr->right,other_tree,match_vec,match_counter) ;
+            }
+        }
+    }
+
+/*
     template<typename DataType>
     void set<DataType>::euler_tour(node<DataType>*ptr,const bst<DataType>&other_tree,
         long long& match_counter,bool (*func_ptr)(const DataType&,const bst<DataType>&))const{
@@ -207,7 +472,7 @@ then insert them
         }
     }
 
-
+*/
     /*
     all the following functions are applications of euler tour
     */
@@ -215,19 +480,24 @@ then insert them
     template<typename DataType>
     set<DataType> set<DataType>::intersect(const set&src)const{
         //if both aren't phi or empty sets
-        if(tree.get_size()&&src.get_size()){
+        if(tree.get_size()&&src.size()){
+            set_function_ptr(fill_for_intersection);
+
             //vector to store elements in both sets
             //it has size of smaller set
-            DataType *v = new DataType[min(src.get_size(),get_size())];
+            const node<DataType> **v = new const node<DataType>*[min(src.nodes_count(),nodes_count())];
             //number of elements in both sets
             long long final_size =0 ;
             //get elements that are in phantom and src and put it into v
-            euler_tour(NULL,src.tree,v,final_size,exist) ;
+            euler_tour(NULL,src.tree,v,final_size) ;
             //create the set
-            set<DataType> s(v,final_size) ;
+            set<DataType>s ;
+
+            s.tree=bst<DataType>(v,final_size) ;
+
             //remove allocated memory
             delete[]v ;
-             v = NULL;
+            v = NULL;
 
             return s ;
         }
@@ -263,23 +533,39 @@ then insert them
             }
 
     }
+
     //returns union of caller and src
     template<typename DataType>
     set<DataType> set<DataType>::unite(const set&src)const{
         //if both exist
-        if(tree.get_size()&&src.get_size()){
+        if(tree.nodes_count()&&src.nodes_count()){
+            set_function_ptr(fill_for_union);
+
             //assuming all elements of phantom are unique
-            DataType*unique_in_phantom=new DataType[get_size()] ;
+            const node<DataType>**unique_in_phantom=new const node<DataType>*[max(src.nodes_count(),nodes_count())] ;
             //counter of uniqie elements that are in phantom and not in src
             long long  counter = 0;
             //vec is filled with data that's in phantom and not in src
-            euler_tour(NULL,src.tree,unique_in_phantom,counter ,not_exist) ;
+            //and with data that's in both
+            euler_tour(NULL,src.tree,unique_in_phantom,counter) ;
             //copy of the src set
-            set <DataType>ret_set =src;
+            set<DataType> ret_set ;
+
+            ret_set.tree=bst<DataType>(unique_in_phantom,counter) ;
+
+            counter= 0;
+
+            src.set_function_ptr(fill_for_union);
+
+            src.euler_tour(NULL,tree,unique_in_phantom,counter) ;
+
             //in that copy insert rest of elements that are unique in the phantom
-            for(int i = 0 ; i<counter;i++){
-                ret_set.tree.insert(unique_in_phantom[i]);
+            for(long long i = 0 ; i<counter;i++){
+                //if data not found in phantom
+                if(!ret_set.search(unique_in_phantom[i]->data))
+                    ret_set.insert(unique_in_phantom[i]->data,unique_in_phantom[i]->counter);
             }
+
             //delete allocated memory
             delete[]unique_in_phantom ;
             unique_in_phantom = NULL;
@@ -295,18 +581,22 @@ then insert them
             return src ;
         }
     }
+
     //returns true if sample-space(phantom contains src set)
     template<typename DataType>
     bool set<DataType>::contain(const set&src)const{
-        if(tree.get_size()){
+        if(tree.get_size()&&src.size()){
+            set_function_ptr(count_for_intersection);
             long long counter = 0 ;
             //search if every node in src is in the phantom(sample-space)
             //if exist increase the counter
-            src.euler_tour(NULL,tree,counter,exist) ;
+            src.set_function_ptr(count_for_intersection);
+            src.euler_tour(NULL,tree,NULL,counter) ;
 
-            return counter==src.get_size();
+            return counter==src.size();
         }
-        return false ;
+
+        return tree.get_size()>=src.size() ;
     }
     /*
     in the sample-space (phantom ) calculate complement of src set
@@ -316,15 +606,26 @@ then insert them
         //if sample space contains src then we get its complement
         //else result doesn't make sense
         if(contain(src)){
-            DataType*vec = new DataType[get_size()-src.get_size()];
-            long long counter  = 0 ;
-            //fill with data that's in the sample space (phantom)and not in src
-            euler_tour(NULL,src.tree,vec,counter,not_exist) ;
-            set s(vec,counter);
-            //delete the array
-            delete[]vec;
-            vec =NULL ;
-            return s ;
+            if(src.size()<size()){
+                set_function_ptr(fill_for_diff);
+                const node<DataType>**vec = new const node<DataType>*[nodes_count()];
+                long long counter  = 0 ;
+                //fill with data that's in the sample space (phantom)and not in src
+                euler_tour(NULL,src.tree,vec,counter) ;
+                set s;
+                s.tree=bst<DataType>(vec,counter);
+
+                //delete the array
+                for(long long i  = 0 ;  i<counter; i++){
+                    //other_tree.traverser->counter-ptr->counter
+                    if(src.search(vec[i]->data)&&s.search(vec[i]->data)){
+                        s.tree.traverser->counter -=src.tree.traverser->counter;
+                    }
+                }
+                delete[]vec;
+                vec =NULL ;
+                return s ;
+            }
         }
         return set(NULL,0)  ;
     }
@@ -336,7 +637,7 @@ then insert them
     //retunrs true if both sets contain same elements
     template<typename DataType>
     bool set<DataType>::equal(const set &src)const{
-        if(src.get_size()==get_size()){
+        if(src.size()==size()){
             return contain(src);
         }
         return 0 ;
@@ -347,20 +648,51 @@ then insert them
         tree.remove_tree();
         return true ;
     }
+
     //returns true if set is empty
     template<typename DataType>
     bool set<DataType>::empty(void)const{
-        return get_size()==0 ;
+        return size()==0 ;
     }
+
     /*
     probability of an event (src) to occur in sample space (phantom)
     */
     template<typename DataType>
+    double set<DataType>::prob_draw_no_replace(const set&src)const{
+        if(size()>=src.size()){
+            long long counter =1;
+            //count number of elements that are in both
+            //set_function_ptr(count_for_prob_set);
+            src.set_function_ptr(count_for_draw_no_replace);
+            src.euler_tour(NULL,tree,NULL,counter);
+
+            return static_cast<double>(counter)/static_cast<double>(choose(size(),src.size())) ;
+        }
+        return 0 ;
+    }
+
+    template<typename DataType>
+    double set<DataType>::prob_draw_replace(const set&src)const{
+        if(size()>=src.size()){
+            long long counter =1;
+            //count number of elements that are in both
+            //set_function_ptr(count_for_prob_set);
+            src.set_function_ptr(count_for_draw_replace);
+            src.euler_tour(NULL,tree,NULL,counter);
+
+            return static_cast<double>(counter)/static_cast<double>(pow(size(),src.size())) ;
+        }
+        return 0 ;
+    }
+
+
+    template<typename DataType>
     double set<DataType>::prob(const set&src)const{
-        long  long  counter =0;
-        //count number of elements that are in both
-        src.euler_tour(NULL,tree,counter,exist);
-        return static_cast<double>(counter)/static_cast<double>(get_size()) ;
+        if(contain(src)){
+            return static_cast<double>(src.size())/static_cast<double>(size()) ;
+        }
+        return 0 ;
     }
 
     /*
@@ -368,7 +700,14 @@ then insert them
     */
     template<typename DataType>
     double set<DataType>::prob_cond(const set&src,const set&condition)const{
-        return prob(src.intersect(condition))/prob(condition);
+        if(contain(src)){
+            double p_cond = prob(condition) ;
+            if(condition.size()>=src.size()&&p_cond>0){
+                return prob(condition.intersect(src))/p_cond;
+           }
+            cout<<"\nConditioning event can't be drawn from the sample-space\n" ;
+        }
+        return 0 ;
     }
     /*
     in sample space (phantom ) check independence between s1 and s2
@@ -394,19 +733,30 @@ then insert them
     //same when phantom is the sample space containing src
     template<typename DataType>
     set<DataType> set<DataType>::diff(const set&src)const {
-        if(get_size()){
-            DataType*vec =new DataType[get_size()];
-            long long counter= 0   ;
-            //for each element in phantom
-            //check if it doesn't exist in src
-            euler_tour(NULL,src.tree,vec,counter,not_exist);
+        if(src.size()&&size()){
+            set_function_ptr(fill_for_diff);
+            const node<DataType>**vec = new const node<DataType>*[nodes_count()];
+            long long counter  = 0 ;
+            //fill with data that's in the sample space (phantom)and not in src
+            euler_tour(NULL,src.tree,vec,counter) ;
+            set s;
+            s.tree=bst<DataType>(vec,counter);
 
-            set ret_set(vec,counter);
-
-            delete[]vec ; vec= NULL;
-            return ret_set ;
+            //delete the array
+            for(long long i  = 0 ;  i<counter; i++){
+                //other_tree.traverser->counter-ptr->counter
+                if(src.search(vec[i]->data)&&s.search(vec[i]->data)){
+                    s.tree.traverser->counter -=src.tree.traverser->counter;
+                }
+            }
+            delete[]vec;
+            vec =NULL ;
+            return s ;
         }
-        return set(NULL,0);
+        if(size()){
+            return *this  ;
+        }
+        return set(NULL,0)  ;
     }
     /*
     retunrs p(s1 U s2 U s3 ........U sN)
@@ -442,38 +792,35 @@ then insert them
         }
         return false ;
     }
+
     //removes duplicates of an element
     template<typename DataType>
     bool set<DataType>::remove_duplicates(const DataType&data){
-         if(tree.remove(data)){
-            while(tree.remove(data)){
-
+         if(tree.search(data)){
+            if(tree.traverser->counter>1){
+                tree.size -=tree.traverser->counter ;
+                tree.size++ ;
+                tree.traverser->counter =1 ;
             }
-            tree.insert(data) ;
             return  1;
          }
          return 0 ;
     }
+
     //remove all duplicates of every element
     template<typename DataType>
     bool set<DataType>::remove_duplicates(void){
-        if(get_size()){
-            DataType*arr =new DataType[get_size()];
+        if(size()){
+            set_function_ptr(always_exist);
+            node<DataType>**arr =new  node<DataType>*[nodes_count()];
             long long counter=0;
             //for each element in phantom push it into the array
-            //don't seach = always_exist
-
-            euler_tour(NULL,tree,arr,counter,always_exist);
-
-            for(long long  i = 0 ; i<get_size() -1; i++){
-                if(arr[i]==arr[i+1]){
-                    int j = i+1;
-                    while(arr[j]==arr[i]&&j<get_size()){
-                        remove(arr[j]);
-                        j++;
-                    }
-                    i =j-1;
-                }
+            //don't search = always_exist
+            euler_tour(NULL,tree,arr,counter);
+            for(long long  i = 0 ; i<counter; i++){
+                tree.size-=arr[i]->counter ;
+                tree.size++;
+                arr[i]->counter=1;
             }
             delete[]arr;
             arr= NULL;
@@ -482,31 +829,377 @@ then insert them
         return 0  ;
     }
 
+    template<typename DataType>
+    double set<DataType>::average(void)const {
+        long long counter= 0 ;
+        if(size()){
+            set_function_ptr(count_for_avg);
+            euler_tour(NULL,tree,NULL,counter) ;
+            return static_cast<double>(counter)/static_cast<double>(size());
+        }
+        return 0  ;
+    }
+
+    template<typename DataType>
+    double set<DataType>::average(const double*weights,const int &weights_size)const {
+
+        if(size()&&weights_size>=nodes_count()){
+            const node<DataType>**arr =new const node<DataType>*[nodes_count()];
+            long long counter=0;
+            //collect the tree then do the calculations
+            set_function_ptr(always_exist);
+            euler_tour(NULL,tree,arr,counter) ;
+            double avg = 0 ;
+            double total_weight = 0;
+            for(long long i=0;i<counter;i++){
+                avg+= static_cast<double>(arr[i]->data)*static_cast<double>(arr[i]->counter)*weights[i]  ;
+                total_weight +=weights[i]*arr[i]->counter;
+            }
+            delete[] arr ;
+            arr =NULL ;
+
+            return avg/total_weight ;
+        }
+        return 0  ;
+    }
+
+    template<typename DataType>
+    double set<DataType>::median(void)const{
+        if(size()){
+
+            const node<DataType>**arr =new  const node<DataType>*[nodes_count()];
+            long long counter=0;
+            //collect the tree then do the calculations
+            set_function_ptr(always_exist);
+            euler_tour(NULL,tree,arr,counter) ;
+
+            double ret_med  ;
+
+            long long i = 0  ;
+
+            long long beg_window = 0;
+            long long end_window = arr[0]->counter;
+
+            while(i<counter){
+
+                if(size()/2>=beg_window&&size()/2<=end_window){
+                    if(size()&1==1){
+                        if(end_window==size()/2){
+                            ret_med = static_cast<double>(arr[i+1]->data) ;
+                        }
+                        else{
+                           ret_med = static_cast<double>(arr[i]->data) ;
+                        }
+                    }
+                    else{
+                        ret_med =static_cast<double>(arr[i]->data);
+                        if(end_window==size()/2){
+                            ret_med+=static_cast<double>(arr[i+1]->data)  ;
+                        }
+                        else{
+                            ret_med +=static_cast<double>(arr[i]->data) ;
+                        }
+                        ret_med =ret_med/2 ;
+                    }
+                    break ;
+                }
+                else{
+                    i++;
+                    beg_window+=arr[i-1]->counter;
+                    end_window+=arr[i]->counter ;
+                }
+            }
+
+            delete[]arr ; arr=NULL ;
+            return ret_med;
+
+        }
+        DataType garbage_value ;
+        cout<<"\ncan't have a median in an empty set (Garbage value)\n" ;
+        return garbage_value ;
+    }
+
+    template<typename DataType>
+    vector<double> set<DataType>::pmf(void)const{
+        if(size()){
+            const node<DataType>**arr =new  const node<DataType>*[nodes_count()];
+            long long counter=0;
+            //collect the tree then do the calculations
+            set_function_ptr(always_exist);
+            euler_tour(NULL,tree,arr,counter) ;
+
+            vector<double>ret_vec(nodes_count()) ;
+
+            for(long long i = 0 ; i <counter;i++){
+                ret_vec[i]=(static_cast<double>(arr[i]->counter)/static_cast<double>(size())) ;
+            }
+
+            delete[]arr ; arr=NULL ;
+            return ret_vec ;
+        }
+        return vector<double>(0)  ;
+    }
+
+/*
+    //probability tree section
+
+    template <typename DataType>
+    p_node<DataType>::p_node(void) {
+        set_ptr = NULL;
+        sample_space_ptr = NULL;
+    }
+
+    template <typename DataType>
+    p_node<DataType>::p_node(set<DataType>*&sample_space, const set<DataType>& _set) {
+        sample_space_ptr=NULL;
+        set_ptr=NULL ;
+        set_ptr = new set<DataType>;
+        *set_ptr = _set;
+        sample_space_ptr = sample_space;
+    }
+
+    template <typename DataType>
+    p_node<DataType>::p_node(const p_node<DataType>& src) {
+        set_ptr = NULL;
+        sample_space_ptr = NULL;
+        if(src.set_ptr){
+            set_ptr= new set<DataType>;
+            *set_ptr= *src.set_ptr;
+        }
+        if(src.sample_space_ptr){
+            sample_space_ptr = src.sample_space_ptr;
+        }
+    }
+
+    template <typename DataType>
+    p_node<DataType>::~p_node() {
+        if(set_ptr){
+            delete set_ptr;
+            set_ptr=NULL;
+        }
+        //sample_space_ptr=NULL ;
+    }
+
+    template <typename DataType>
+    void p_node<DataType>::operator=(const p_node<DataType>&src) {
+        //if not same sample space there will be memory leaks
+        //weird seg-faults
+        if(sample_space_ptr==NULL&&src.sample_space_ptr!=NULL){
+            sample_space_ptr = src.sample_space_ptr;
+        }
+        if(sample_space_ptr==src.sample_space_ptr){
+            if(set_ptr){
+                delete set_ptr;
+                set_ptr=NULL;
+            }
+            if(src.set_ptr){
+                set_ptr= new set<DataType>;
+                *set_ptr= *src.set_ptr;
+            }
+        }
+
+    }
+
+    template <typename DataType>
+    bool p_node<DataType>::operator< (const p_node<DataType>& src) const {
+         if(set_ptr&&sample_space_ptr&&src.set_ptr&&src.sample_space_ptr){
+            return sample_space_ptr->prob(*set_ptr)<src.sample_space_ptr->prob(*src.set_ptr) ;
+         }
+         return 0 ;
+    }
+
+    template <typename DataType>
+    bool p_node<DataType>::operator> (const p_node<DataType>&src) const {
+        if(set_ptr&&sample_space_ptr&&src.set_ptr&&src.sample_space_ptr){
+            return sample_space_ptr->prob(*set_ptr)>src.sample_space_ptr->prob(*src.set_ptr) ;
+        }
+        return 0 ;
+    }
+
+    template <typename DataType>
+    bool p_node<DataType>::operator<=(const p_node<DataType>&src) const {
+        if(set_ptr&&sample_space_ptr&&src.set_ptr&&src.sample_space_ptr){
+            return sample_space_ptr->prob(*set_ptr)<src.sample_space_ptr->prob(*src.set_ptr) ;
+        }
+        return(set_ptr==NULL&&src.set_ptr==NULL);
+    }
+
+    template <typename DataType>
+    bool p_node<DataType>::operator>=(const p_node<DataType>&src) const {
+        if(set_ptr&&sample_space_ptr&&src.set_ptr&&src.sample_space_ptr){
+            return (*sample_space_ptr)->prob(*set_ptr)>(*src.sample_space_ptr)->prob(*src.set_ptr) ;
+        }
+        return(set_ptr==NULL&&src.set_ptr==NULL);
+     }
+
+    template <typename DataType>
+    bool p_node<DataType>::operator==(const p_node<DataType>&src) const {
+        if(set_ptr&&sample_space_ptr&&src.set_ptr&&src.sample_space_ptr){
+            return sample_space_ptr->prob(*set_ptr)==src.sample_space_ptr->prob(*src.set_ptr) ;
+        }
+        return(set_ptr==NULL&&src.set_ptr==NULL);
+    }
+
+    template <typename DataType>
+    bool p_node<DataType>::operator!=(const p_node<DataType>&src) const {
+        return !(*this==src);
+    }
+
+
+    //say we insert or search or delete target_set
+    template<typename DataType>
+    void prob_tree<DataType>::euler_tour(node<set<DataType>>*ptr,bool (*func_ptr)(node<set<DataType>>*,const set<DataType>&)
+        ,const set<DataType>&target_set,bool&search_response){
+        if(ptr==NULL){
+            ptr= tree.root ;
+        }
+        if(ptr){
+            if(ptr->left){
+                euler_tour(ptr->left,func_ptr,target_set) ;
+            }
+            //do what you want with ptr
+            if(func_ptr(ptr,target_set)){
+                search_response =true ;
+            }
+            if(ptr->right){
+                euler_tour(ptr->right,func_ptr,target_set) ;
+            }
+        }
+    }
+    */
+/*
+    template<typename DataType>
+    bool prob_tree<DataType>::is_leaf(const node<set<DataType>>*ptr)      {
+        return ptr->left==ptr->right&&ptr->left==NULL;
+    }
+
+    template<typename DataType>
+    bool prob_tree<DataType>::is_not_leaf(const node<set<DataType>>*ptr)  {
+        return !is_leaf(ptr) ;
+    }
+
+    template<typename DataType>
+    bool prob_tree<DataType>::insert_node(node<set<DataType>>*ptr,const set<DataType>&target_set)  {
+        //if leaf at right we insert intersection with event
+        //at left we insert intersection with event'
+        if(is_leaf(ptr)){
+            ptr->left= get_node(ptr->data.intersect(target_set));
+            ptr->right= get_node(ptr->data.intersect(ptr->data.comp(target_set)));
+            return 1 ;
+        }
+        return 0 ;
+    }
+
+    template<typename DataType>
+    bool prob_tree<DataType>::search_node(node<set<DataType>>*ptr,const set<DataType>&src)  {
+         return ptr->data.equal(src) ;
+    }
+    template<typename DataType>
+    prob_tree<DataType>::prob_tree(void)  {
+        sample_space_ptr =NULL;
+        tree =bst<set<DataType>>() ;
+    }
+
+    template<typename DataType>
+    prob_tree<DataType>::prob_tree(const set<DataType>&sample_space)  {
+        sample_space_ptr =NULL;
+        sample_space_ptr=new set<DataType>;
+        *sample_space_ptr =sample_space ;
+        tree.root=get_node(sample_space) ;
+        tree.size++;
+    }
+
+    template<typename DataType>
+    prob_tree<DataType>::~prob_tree(void) {
+        if(sample_space_ptr){
+            delete sample_space_ptr;
+            sample_space_ptr=NULL ;
+        }
+        tree.remove_tree() ;
+    }
+
+    //if the set has no intersection with original sample space
+    //its not inserted same for the set_arr aswell
+    template<typename DataType>
+    prob_tree<DataType>::prob_tree(const set<DataType>&sample_space,const set<DataType>*set_arr,int size){
+        sample_space_ptr =NULL;
+        sample_space_ptr=new set<DataType>;
+        *sample_space_ptr =sample_space ;
+
+        p_node<DataType>* arr = new p_node<DataType>[size];
+
+        for(int i = 0; i < size; i++){
+            arr[i] = p_node<DataType>(sample_space_ptr, set_arr[i]);
+        }
+
+        std::sort(arr, (arr + size));
+
+        tree= bst<set<DataType>>();
+        tree.root=get_node(sample_space) ;
+
+        std::queue<node<set<DataType>>*> queue;
+        queue.push(tree.root);
+
+        for (int i = size -1; i >= 0; --i) {
+            node< set<DataType> >* current = queue.front();
+            queue.pop();
+            // Insert the next element from arr into the right and left children of current
+            if (is_leaf(current)) {
+                set<DataType>temp = current->data.intersect(*(arr[i].set_ptr)) ;
+                if(!temp.empty()){
+                    current->right =  get_node(temp);
+                    current->right->parent= current;
+                }
+                temp=current->data.intersect(sample_space.comp(*(arr[i].set_ptr))) ;
+                if(!temp.empty()){
+                    current->left = get_node(temp);
+                    current->left->parent= current;
+                }
+            }
+            // Add the children to the queue for the next level
+            if (current->left != NULL) {
+                queue.push(current->left);
+            }
+            if (current->right != NULL) {
+                queue.push(current->right);
+            }
+        }
+        delete []arr;
+        arr=NULL;
+    }
+
+    template<typename DataType>
+    bool prob_tree<DataType>::insert(const set<DataType>&target_set){
+        if(sample_space_ptr->contain(target_set)){
+           bool ret_logic =false ;
+            euler_tour(NULL,insert_node,target_set,ret_logic) ;
+            return ret_logic;
+        }
+        return 0 ;
+    }
+
+    template<typename DataType>
+    bool prob_tree<DataType>::search(const set<DataType>&target_set) {
+        if(sample_space_ptr->contain(target_set)){
+           bool ret_logic =false ;
+            euler_tour(NULL,search_node,target_set,ret_logic) ;
+            return ret_logic;
+        }
+        return 0 ;
+    }
+
+    template<typename DataType>
+    void prob_tree<DataType>::print(void) const {
+        tree.breadth_first() ;
+    }
+
+    template<typename DataType>
+    void prob_tree<DataType>::move(void)const{
+        tree.move() ;
+    }
+*/
 
 int main(){
 
-    srand(time(0)) ;
-    set<int>s1, s2 ;
-    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    std::mt19937 gen(seed); // Standard mersenne_twister_engine seeded with high_resolution_clock
-    std::uniform_int_distribution<> distrib(0, 100000000);
-    for(int i = 0 ;i< 1000000; i++){
-        int random_number = distrib(gen);
-        s1.insert(random_number);
-        random_number = distrib(gen);
-        s2.insert(random_number);
-    }
-    //cout<<s1.get_size();
-    //cout<<s1<<endl;
-    //cout<<s2.get_size()<<endl;
-
-    //cout<<s2<<endl  ;
-    s1.intersect(s2) ;
-
-    s1.unite(s2) ;
-
-    set<int>s3 = s1.unite(s2).comp(s1) ;
-
-    cout<<s1.unite(s2).get_size()<<","<<s1.get_size()<<","<<s2.get_size()<<","<<s3.get_size() ;
 
 }
