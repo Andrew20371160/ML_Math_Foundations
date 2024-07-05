@@ -140,7 +140,9 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
     //insert an element into the set
     template<typename DataType>
     bool set<DataType>::insert(DataType data,int count ){
-        return tree.insert(data,count) ;
+        if(count>0)
+            return tree.insert(data,count) ;
+        return 0  ;
     }
     //insert an array into the set
 
@@ -787,8 +789,11 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
     */
     template<typename DataType>
     bool set<DataType>::replace(const DataType&old_data,const DataType&new_data){
-        if(tree.remove(old_data)){
-            return tree.insert(new_data);
+
+        if(tree.search(old_data)){
+            int count = tree.traverser->counter ;
+            tree.remove(old_data) ;
+            return tree.insert(new_data,count);
         }
         return false ;
     }
@@ -1199,7 +1204,8 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
     }
 */
 
+
 int main(){
 
-
+return 0 ;
 }
