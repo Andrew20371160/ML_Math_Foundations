@@ -104,6 +104,10 @@ class set{
 
     bool count_for_avg(  node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec);
 
+    bool count_for_var( const node<DataType>*ptr,const bst<DataType>&other_tree,long long &counter,const node<DataType>**match_vec)const;
+
+    bool count_for_var(  node<DataType>*ptr, bst<DataType>&other_tree,long long &counter, node<DataType>**match_vec);
+
     /*
     this function fills counter with multiplication of  ni ^ ki of each element in the set
     where ni is count in the sample space and ki is count in the other set
@@ -125,7 +129,6 @@ class set{
 
     bool count_for_intersection( node<DataType>*ptr,  bst<DataType>&other_tree, long long &counter,  node<DataType>**match_vec);
 
-    bool count_for_prob( node<DataType>*ptr,  bst<DataType>&other_tree, long long &counter,  node<DataType>**match_vec);
 
     bool exist( node<DataType>*ptr,  bst<DataType>&other_tree, long long &counter,  node<DataType>**match_vec);
 
@@ -287,12 +290,20 @@ public:
     sum of xi *ni /total n
     */
     double average(void)const ;
+
+    double variance(void)const ;
+
+    double standard_deviation(void)const ;
+
+    DataType range(void)const ;
+
     /*
     returns sum of xi*weight[i] *ni /(weigts[i]*ni)
     note:weights must be according to each unique element and they must correspond to the elements in the same in order fashion
     so for set {1,1,1,5,6,7} ->weights are [2.5,65,56] where 2.5 is weight of ones and so on....
     */
     double average(const double*weights,const int &weights_size)const ;
+
 
     /*
     returns the median of a set of elements
