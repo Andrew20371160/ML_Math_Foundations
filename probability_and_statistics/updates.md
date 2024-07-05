@@ -24,6 +24,8 @@ in one O(logn) instead of 25*O(logn)
 
 10-feel free to use any code :)
 
+11-Just added those aswell variance ,standard_deviation ,range 
+
 7/2/2024 update :
 fixed a bug that caused an open-loop when removing duplicates from a the set
 now remove duplicates works fine 
