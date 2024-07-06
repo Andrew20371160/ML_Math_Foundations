@@ -1,3 +1,7 @@
+7/7/2024 update :
+added cmf 
+added update_count which allows to adjust the count of an instance of an element in the set
+have fun!
 7/5/2024 big updates :
 1-updated the class to be a multi-set or a bag 
   -now it allocates memory for unique elements only and for duplicates are stored in a counter for each node
