@@ -802,13 +802,34 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
     */
     template<typename DataType>
     bool set<DataType>::replace(const DataType&old_data,const DataType&new_data){
-
         if(tree.search(old_data)){
             int count = tree.traverser->counter ;
             tree.remove(old_data) ;
             return tree.insert(new_data,count);
         }
         return false ;
+    }
+    /*
+    update the count of an element or an instance with a new count
+    if zero element is deleted
+    */
+    template<typename DataType>
+    bool set<DataType>::update_count(const DataType&data,const int &count){
+        if(count>=0){
+            if(count==0){
+                return tree.remove(data) ;
+            }
+            else{
+                if(tree.search(data)){
+                    int old_count=  tree.traverser->counter;
+                    tree.size-=old_count ;
+                    tree.size+=count  ;
+                    tree.traverser->counter = count ;
+                    return 1;
+                }
+            }
+        }
+        return 0 ;
     }
 
     //removes duplicates of an element
@@ -986,6 +1007,18 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
             return ret_vec ;
         }
         return vector<double>(0)  ;
+    }
+
+    template<typename DataType>
+    vector<double> set<DataType>::cmf(void)const{
+        if(size()){
+            vector<double>pmfvec = pmf() ;
+            for(int i =1 ;i<pmfvec.size() ;i++){
+                pmfvec[i] +=pmfvec[i-1] ;
+            }
+            return pmfvec ;
+        }
+        return vector<double>(0)   ;
     }
 
 /*
@@ -1247,7 +1280,21 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
     }
 */
 
+#include <chrono>
 
 int main(){
+    
+    int space[] ={1,1,1,2,5,8} ;
+
+    int arr[] =  {1,4,78} ;
+
+    int arr2[] = {1,1,4,5,5,6} ;
+
+    set<int>s1(space,sizeof(space)/sizeof(int));
+
+    set<int>s2(arr,sizeof(arr)/sizeof(int));
+
+    set<int>s3(arr2,sizeof(arr2)/sizeof(int));
+
 
 }
