@@ -17,8 +17,8 @@ class set{
     /*
     bst stores elements and duplicates are allowed (you can say it's a multi-set or a bag)
     the duplicates are handled such that they are stored in one node only
-    also fixed the issue where if an array with duplicates is inserted now it's handled such that 
-    there are no scattared duplicates around the bst 
+    also fixed the issue where if an array with duplicates is inserted now it's handled such that
+    there are no scattared duplicates around the bst
     the bst only allocates memory for unique elements and the duplicates are stored as a counter
     if you want the class to act as a normal set just use remove_dupllicates
     */
@@ -29,16 +29,16 @@ class set{
     are based on the concept of euler tour that I learned at college
     the idea is simple while inorder traversing elements of phantom if that do the operation you want with the node
     int the other tree or (set) then we push it into the match_vector which is an array of pointers to pointers
-    to copy wanted nodes efficiently without wasting memory (no memory leaks dw) if there is tell me though 
+    to copy wanted nodes efficiently without wasting memory (no memory leaks dw) if there is tell me though
 
     for example the intersection of 2 sets is elements that exist in both sets
     so for each element in tree1 if it exists in tree2 put the node with less count into match_Vector
-    for example if element1 contains 3 duplicates and the other contains 1 the latter is put into the vector 
+    for example if element1 contains 3 duplicates and the other contains 1 the latter is put into the vector
 
     same idea is used in union of 2 sets ,probability of events ,conditional probability ,every function till now
     all applicable using one line just foucs on the functionality or what to do when visiting node of tree1
     if it has a property related to tree2
-    
+
     while traversing tree1 if func_ptr(data ,three2) do something either fill a vector ,increase a counter...etc
     */
     void euler_tour(const node<DataType>*ptr,const bst<DataType>&other_tree,
@@ -47,12 +47,12 @@ class set{
     void euler_tour( node<DataType>*ptr, bst<DataType>&other_tree,
                     node<DataType>**,long long &match_counter);
     /*
-    the next set of declarations are for functions that are used to fill the array of pointers or the counter 
+    the next set of declarations are for functions that are used to fill the array of pointers or the counter
     during the tour
     */
     /*
-    this function fills the set with intersection elements between 2 sests 
-    if there are duplicates it fills it with the one with less count of duplicates 
+    this function fills the set with intersection elements between 2 sests
+    if there are duplicates it fills it with the one with less count of duplicates
     */
     bool fill_for_intersection(const node<DataType>*ptr, const bst<DataType>&other_tree, long long &counter,  const node<DataType>**match_vec)const;
     /*
@@ -61,23 +61,23 @@ class set{
     */
     bool fill_for_union(const node<DataType>*ptr, const bst<DataType>&other_tree, long long &counter,  const node<DataType>**match_vec)const;
 
-    //    this function fills match vector with elements that are unique to phantom set only 
+    //    this function fills match vector with elements that are unique to phantom set only
 
     bool fill_for_unique(const node<DataType>*ptr, const bst<DataType>&other_tree, long long &counter,  const node<DataType>**match_vec)const;
     /*
-    fills the array with elements (addresses of pointers) that exists in the phantom and not in the other set 
-    and with the intersection aswell 
-    and in diff function the difference between elements is handled 
-    for ex : if sample space contains 3 elements and the set contains 1 of that elements then difference is 
+    fills the array with elements (addresses of pointers) that exists in the phantom and not in the other set
+    and with the intersection aswell
+    and in diff function the difference between elements is handled
+    for ex : if sample space contains 3 elements and the set contains 1 of that elements then difference is
     2 of that elements
     */
     bool fill_for_diff(const node<DataType>*ptr, const bst<DataType>&other_tree, long long &counter,  const node<DataType>**match_vec)const;
     /*
-    this function counts number of elements in both sets 
+    this function counts number of elements in both sets
     for duplicates it counts the min of the 2 elements
     */
     bool count_for_intersection(const node<DataType>*ptr, const bst<DataType>&other_tree, long long &counter,  const node<DataType>**match_vec)const;
-    
+
 
     /*
     this fucntion fills counter with multiplication of ni choose ki of elements
@@ -265,6 +265,13 @@ public:
     else it returns 0
     */
     double prob_cond(const set&src,const set&condition)const;
+    /*
+        p(src|condition) = p(src intersect condition) /p(condition)
+        p(condition|src) = p(src intersect condition) /p(src)
+        p(src intersect condition) =p(src|condition) *p(condition) = p(condition|src)*p(src)
+        p(condition|src) = p(src|condition)*p(condition)/p(src)
+    */
+    double bayes(const set&src,const set&condition)const;
 
     /*
     in sample space (phantom) returns true if s1 and s2 are independent events
@@ -416,6 +423,18 @@ public:
             bool operator!=(const p_node&)const  ;
     };
 
+    template<typename DataType>
+
+        bool is_leaf(const node<set<DataType>>*ptr)      ;
+            template<typename DataType>
+
+        bool is_not_leaf(const node<set<DataType>>*ptr)  ;
+    template<typename DataType>
+
+        bool insert_node( node<set<DataType>>*ptr,const set<DataType>&)  ;
+    template<typename DataType>
+
+        bool search_node( node<set<DataType>>*ptr,const set<DataType>&)  ;
 
     template<typename DataType>
     class prob_tree{
@@ -423,12 +442,6 @@ public:
         //so no excess copying of sample space
         set<DataType>*sample_space_ptr;
         bst<set<DataType>>tree ;
-
-        bool is_leaf(const node<set<DataType>>*ptr)      ;
-        bool is_not_leaf(const node<set<DataType>>*ptr)  ;
-
-        bool insert_node( node<set<DataType>>*ptr,const set<DataType>&)  ;
-        bool search_node( node<set<DataType>>*ptr,const set<DataType>&)  ;
 
         //void replace_node( node<DataType>*ptr,const set<DataType>&) ;
         //only way to insert/do anything is through euler tour
