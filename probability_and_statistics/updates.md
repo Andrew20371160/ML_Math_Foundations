@@ -1,3 +1,19 @@
+7/8/2024 update :
+1-added bayes rule 
+
+2-added something called prob_tree I built it and tested you can see the testing code in the main function 
+  I have to say I don't understand how it works 
+  It works and I understand the engineering or code behind it but I don't understand the mathematical concept of it 
+  for ex : it insert and event and it's complement in the left and then the right child (it's a binary tree)
+  it only inserts events at leafs thoguh 
+  anyway there are no memory leaks in it you just initialize it using a constructor 
+  via defining the sample space then an  array of sets and pass the size of that array and you can insert nodes into it using insert
+  you can't delete a node but anyway the destructors work and there are no memory leaks 
+  you don't have to give much care about it but thought maybe someone could help me in finding an application of such data structure
+  btw the array of sets are inserted sorted by their probability of occurrance in decending order 
+
+3-let me know if you have any suggestions
+
 7/7/2024 update :
 added cmf 
 added update_count which allows to adjust the count of an instance of an element in the set
