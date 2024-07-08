@@ -135,7 +135,9 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
     //though bst is deleted anyway but just in case :)
     template<typename DataType>
     set<DataType>::~set(void){
+
         tree.remove_tree() ;
+
     }
     //insert an element into the set
     template<typename DataType>
@@ -725,6 +727,19 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
         return 0 ;
     }
     /*
+        p(src|condition) = p(src intersect condition) /p(condition)
+        p(condition|src) = p(src intersect condition) /p(src)
+        p(src intersect condition) =p(src|condition) *p(condition) = p(condition|src)*p(src)
+        p(condition|src) = p(src|condition)*p(condition)/p(src)
+    */
+    template<typename DataType>
+    double set<DataType>::bayes(const set&src,const set&condition)const{
+
+        return (prob_cond(src,condition)*prob(condition)) /prob(src)  ;
+
+    }
+
+    /*
     in sample space (phantom ) check independence between s1 and s2
     */
     template<typename DataType>
@@ -1021,7 +1036,6 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
         return vector<double>(0)   ;
     }
 
-/*
     //probability tree section
 
     template <typename DataType>
@@ -1136,43 +1150,52 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
         }
         if(ptr){
             if(ptr->left){
-                euler_tour(ptr->left,func_ptr,target_set) ;
+                euler_tour(ptr->left,func_ptr,target_set,search_response) ;
             }
             //do what you want with ptr
             if(func_ptr(ptr,target_set)){
                 search_response =true ;
             }
             if(ptr->right){
-                euler_tour(ptr->right,func_ptr,target_set) ;
+                euler_tour(ptr->right,func_ptr,target_set,search_response) ;
             }
         }
     }
-    */
-/*
+
     template<typename DataType>
-    bool prob_tree<DataType>::is_leaf(const node<set<DataType>>*ptr)      {
+    bool is_leaf(const node<set<DataType>>*ptr)      {
         return ptr->left==ptr->right&&ptr->left==NULL;
     }
 
     template<typename DataType>
-    bool prob_tree<DataType>::is_not_leaf(const node<set<DataType>>*ptr)  {
+    bool is_not_leaf(const node<set<DataType>>*ptr)  {
         return !is_leaf(ptr) ;
     }
 
     template<typename DataType>
-    bool prob_tree<DataType>::insert_node(node<set<DataType>>*ptr,const set<DataType>&target_set)  {
+    bool insert_node(node<set<DataType>>*ptr,const set<DataType>&target_set)  {
         //if leaf at right we insert intersection with event
         //at left we insert intersection with event'
         if(is_leaf(ptr)){
-            ptr->left= get_node(ptr->data.intersect(target_set));
-            ptr->right= get_node(ptr->data.intersect(ptr->data.comp(target_set)));
+            set<DataType> temp =ptr->data.intersect(target_set) ;
+            if(temp.size())
+            {
+                ptr->left= get_node(temp);
+                ptr->left->parent=ptr;
+            }
+
+            temp = ptr->data.intersect(ptr->data.comp(target_set)) ;
+            if(temp.size()){
+                ptr->right= get_node(temp);
+                ptr->right->parent= ptr ;
+            }
             return 1 ;
         }
         return 0 ;
     }
 
     template<typename DataType>
-    bool prob_tree<DataType>::search_node(node<set<DataType>>*ptr,const set<DataType>&src)  {
+    bool search_node(node<set<DataType>>*ptr,const set<DataType>&src)  {
          return ptr->data.equal(src) ;
     }
     template<typename DataType>
@@ -1278,12 +1301,11 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
     void prob_tree<DataType>::move(void)const{
         tree.move() ;
     }
-*/
 
 #include <chrono>
 
 int main(){
-    
+/*
     int space[] ={1,1,1,2,5,8} ;
 
     int arr[] =  {1,4,78} ;
@@ -1296,5 +1318,157 @@ int main(){
 
     set<int>s3(arr2,sizeof(arr2)/sizeof(int));
 
+    cout<<endl<<s1;
 
+    cout<<endl<<s2;
+
+    cout<<endl<<s3;
+
+    s1.update_count(2,0) ;
+
+    s1.update_count(2,5) ;
+
+    s1.update_count(1,2) ;
+    cout<<endl<<s1;
+    cout<<s1.size() ;
+
+    //s1.remove_duplicates();
+    //cout<<s1;
+
+*/
+    // Define a sample space (set of integers)
+    // Define a sample space (set of integers)
+    int arr[] = {1, 2, 3, 4, 5,6,7,8,9,10,11,12};
+    set<int> sample_space(arr,sizeof(arr)/sizeof(int)) ;
+
+    // Create an array of sets to insert into the prob_tree
+    set<int>sets[4] ;
+    for(int i = 1 ;i<4;i++){
+        sets[0].insert(i) ;
+        sets[1].insert(i+3) ;
+        sets[2].insert(i+6) ;
+        sets[3].insert(i+9) ;
+    }
+
+
+
+    //int num_sets = sizeof(sets) / sizeof(sets[0]);
+
+    // Create a prob_tree instance with the sample space and sets array
+    prob_tree<int> my_tree(sample_space, sets, 4);
+
+    // Print the tree contents (for debugging purposes)
+    cout << "Tree contents:" << endl;
+
+
+    my_tree.print() ;
+    my_tree.move() ;
+
+    sets[0].clear() ;
+    sets[1].clear() ;
+    sets[2].clear() ;
+    sets[3].clear() ;
+
+    for(int i = 1 ;i<=2;i++){
+        sets[0].insert(i) ;
+        sets[1].insert(i+3) ;
+        sets[2].insert(i+6) ;
+        sets[3].insert(i+9) ;
+    }
+
+
+
+my_tree.insert(sets[0]);
+my_tree.insert(sets[1]);
+my_tree.insert(sets[2]);
+my_tree.insert(sets[3]);
+
+
+
+    sets[0].clear() ;
+    sets[1].clear() ;
+    sets[2].clear() ;
+    sets[3].clear() ;
+
+
+for(int i = 1 ;i<=2;i++){
+    sets[0].insert(i+2) ;
+    sets[1].insert(i+3+2) ;
+    sets[2].insert(i+6+2) ;
+    sets[3].insert(i+9+2) ;
+}
+
+    sets[0].clear() ;
+    sets[1].clear() ;
+    sets[2].clear() ;
+    sets[3].clear() ;
+
+
+for(int i = 1 ;i<=2;i++){
+    sets[0].insert(i+2) ;
+    sets[1].insert(i+3+1) ;
+    sets[2].insert(i+6+1) ;
+    sets[3].insert(i+9+1) ;
+}
+    sets[0].clear() ;
+    sets[1].clear() ;
+    sets[2].clear() ;
+    sets[3].clear() ;
+
+
+for(int i = 1 ;i<=2;i++){
+    sets[0].insert(i+2+3) ;
+    sets[1].insert(i+3+3) ;
+    sets[2].insert(i+6+3) ;
+    sets[3].insert(i+9+3) ;
+}
+
+
+my_tree.print() ;
+my_tree.move() ;
+
+
+
+
+/*
+    auto start = std::chrono::high_resolution_clock::now();
+
+    srand(time(0));
+    set<int>s1, s2;
+    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    std::mt19937 gen(seed); // Standard mersenne_twister_engine seeded with high_resolution_clock
+    std::uniform_int_distribution<> distrib(0, 100000000);
+    for(int i = 0 ;i< 10000000; i++){
+        int random_number = distrib(gen);
+        s1.insert(random_number);
+
+        random_number = distrib(gen);
+        s2.insert(random_number);
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Time taken for insertion: " << elapsed.count() << "s\n";
+
+    start = std::chrono::high_resolution_clock::now();
+    s1.intersect(s2);
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    std::cout << "Time taken for intersection: " << elapsed.count() << "s\n";
+
+    start = std::chrono::high_resolution_clock::now();
+    s1.unite(s2);
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    std::cout << "Time taken for union: " << elapsed.count() << "s\n";
+
+    start = std::chrono::high_resolution_clock::now();
+    set<int>s3 = s1.unite(s2).comp(s1);
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    std::cout << "Time taken for complement: " << elapsed.count() << "s\n";
+
+    //std::cout << s1.unite(s2).size() << "," << s1.size() << "," << s2.size() << "," << s3.size() << "\n";
+     return 0;
+*/
 }
