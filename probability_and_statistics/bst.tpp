@@ -78,7 +78,7 @@
 
     //helper function to allocate memory for a new node
     template <typename DataType>
-    node<DataType>*bst<DataType>::get_node(const DataType & _data,const int&counter){
+    node<DataType>*get_node(const DataType & _data,const int&counter){
 
         node<DataType>*new_node=new node<DataType> ;
 
