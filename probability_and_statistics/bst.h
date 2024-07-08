@@ -57,6 +57,11 @@ struct node{
 
 
 enum {not_sorted=0,sorted} ;
+template<typename DataType>
+//helper function to allocate memory for a new node
+//by default the number of instances of the element (data) is one
+node<DataType>*get_node(const DataType& _data,const int &counter = 1);//passed
+
 
 /*
 The bst is modified to allow multiple instances of the same element
@@ -69,6 +74,8 @@ class bst{
 
     template<typename set_DataType>
     friend class set;
+    template<typename set_DataType>
+    friend class prob_tree;
     //root of the bst
     node<DataType>*root ;
     //this pointer is used in traversing the tree and search and deltetion
@@ -84,10 +91,6 @@ class bst{
     /*
     helper functions that aren't accessible by the user
     */
-
-    //helper function to allocate memory for a new node
-    //by default the number of instances of the element (data) is one
-    node<DataType>*get_node(const DataType& _data,const int &counter = 1);//passed
 
 
     //checks if ptr is left or right child or is the root
