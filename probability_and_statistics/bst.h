@@ -35,9 +35,7 @@ struct node{
 
     /*
     to_string overloading for different data types
-    needed for custom_data and save and load
-    if overloading occurs for very large integers these will produce wrong out put
-
+    if overloading occurs for very large integers these will produce wrong output
     */
     string to_string(const int &data);
     string to_string(const char &data);
