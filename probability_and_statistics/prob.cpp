@@ -423,9 +423,9 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
          return 1 ;
     }
     /*
-    this function fills vector/increase counter based on a conditino between phantom and caller
+    this function fills vector/increase counter based on a condition between phantom and input set
     if data in phantom exists in data in caller
-    if data in phantom not exist
+    if data in phantom doesn't exist
     etc etc
     so if we calculate intersection we push every element that's in phantom and in other_tree
     into the match_vec
