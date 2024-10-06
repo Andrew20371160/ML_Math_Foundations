@@ -1,3 +1,4 @@
+10/6/2024: fixed a miss-calculation in conditional probablity
 7/8/2024 update :
 1-added bayes rule 
 
