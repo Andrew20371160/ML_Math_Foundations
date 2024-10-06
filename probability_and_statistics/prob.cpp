@@ -423,9 +423,9 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
          return 1 ;
     }
     /*
-    this function fills vector/increase counter based on a condition between phantom and input set
+    this function fills vector/increase counter based on a conditino between phantom and caller
     if data in phantom exists in data in caller
-    if data in phantom doesn't exist
+    if data in phantom not exist
     etc etc
     so if we calculate intersection we push every element that's in phantom and in other_tree
     into the match_vec
@@ -610,7 +610,7 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
             src.set_function_ptr(count_for_intersection);
             src.euler_tour(NULL,tree,NULL,counter) ;
 
-            return counter==src.size();
+            return counter>=src.size();
         }
 
         return tree.get_size()>=src.size() ;
@@ -713,7 +713,8 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
     }
 
     /*
-    probability of an event (src) to occur in sample space (phantom) knowing that event condition occurred
+    probability of an event (src) to occur in sample space (phantom)
+    knowing that event condition occurred
     */
     template<typename DataType>
     double set<DataType>::prob_cond(const set&src,const set&condition)const{
@@ -1305,6 +1306,18 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
 #include <chrono>
 
 int main(){
+
+    string space[4] ={"hh","ht","th","tt"};
+    string aev[2] ={"hh","ht"};
+    string bev[2] ={"hh","th"};
+    string cev[2] ={"hh","tt"};
+    set<string>sample_space(space,4);
+    set<string>a(aev,2);
+    set<string>b(bev,2);
+    set<string>c(cev,2);
+    cout<<sample_space.prob_cond(c,a.intersect(b));
+    system("pause");
+
 /*
     int space[] ={1,1,1,2,5,8} ;
 
@@ -1335,7 +1348,7 @@ int main(){
     //s1.remove_duplicates();
     //cout<<s1;
 
-*/
+
     // Define a sample space (set of integers)
     // Define a sample space (set of integers)
     int arr[] = {1, 2, 3, 4, 5,6,7,8,9,10,11,12};
