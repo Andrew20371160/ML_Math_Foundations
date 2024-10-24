@@ -1058,7 +1058,7 @@ void set<DataType>::set_function_ptr(bool (set<DataType>::*ptr)( node<DataType>*
     }
 
     template<typename DataType>
-    vector<double> set<DataType>::cmf(void)const{
+    vector<double> set<DataType>::cdf(void)const{
         if(size()){
             vector<double>pmfvec = pmf() ;
             for(int i =1 ;i<pmfvec.size() ;i++){
