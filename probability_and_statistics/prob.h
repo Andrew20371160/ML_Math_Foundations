@@ -327,11 +327,11 @@ public:
     vector<double> pmf(void)const ;
 
     /*
-    returns a vector where each element of that vector correspond to the cmf value of the instance or element to occur
+    returns a vector where each element of that vector correspond to the cdf value of the instance or element to occur
     pmf of {1,1,1,2,5,8} is [3/6,1/6,1/6,1/6]
-    so cmf is [3/6,4/6,5/6,6/6] where 3/6 is for ones and 4/6 for 2 and so on
+    so cdf is [3/6,4/6,5/6,6/6] where 3/6 is for ones and 4/6 for 2 and so on
     */
-    vector<double> cmf(void)const ;
+    vector<double> cdf(void)const ;
 
 
 /*
