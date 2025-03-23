@@ -637,18 +637,40 @@ bool multiset<DataType>::unique_elements_tour(const node<DataType>*src_tree_ptr,
 		}	
 		return 0  ;
     }
+	template<typename DataType>
+	bool multiset<DataType>::apply_function_tour(node<DataType>*src_tree_ptr,bool(*f_ptr)(DataType&,uint32_t&,
+														  	  		  DataType*,uint32_t*,const uint32_t),
+																	  DataType*v1,uint32_t*v2,uint32_t size){
+		if(src_tree_ptr){
+			if(src_tree_ptr->left){
+				apply_function_tour(src_tree_ptr->left,f_ptr,v1,v2,size) ;
+			}
+			f_ptr(src_tree_ptr->data,src_tree_ptr->counter,v1,v2,size) ; 
+			if(src_tree_ptr->right){
+				apply_function_tour(src_tree_ptr->right,f_ptr,v1,v2,size) ;
+			}
+		}
+	}
+	template<typename DataType>
+	bool  multiset<DataType>::remove_duplicates(void){
+		if(tree.nodes_count){
+			apply_function_tour(tree.root,remove_duplicates_function,NULL,NULL,0) ;
+			tree.total_count = tree.nodes_count ;
+			return 1 ;
+		}
+		return 0; 
+	}  
+	template<typename DataType>
+	multiset<DataType> multiset<DataType>::normalize(void) {
+		if(tree.nodes_count){
+			multiset<DataType>ret_set = *this;
+			DataType *avg_and_stddev= new DataType[2] ;
+			avg_and_stddev[0] = average() ;
+			avg_and_stddev[1] = standard_deviation();
+			apply_function_tour(ret_set.tree.root,standardize_element,avg_and_stddev,NULL,2) ;
+			delete[]avg_and_stddev ;avg_and_stddev =NULL;
+			return ret_set; 
+		}
+		return multiset(); 
+	}
 
-int main(){
-	multiset<double> m1 ; 
-	multiset<double> m2 ; 
-	m1.insert(1);
-	m1.insert(1);
-	m1.insert(2);
-	m1.insert(3);
-
-	m2.insert(1);
-
-	std::cout<<m1.range();
-
-	system("pause"); 
-}
