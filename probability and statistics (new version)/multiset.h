@@ -7,6 +7,15 @@
 enum mode {
 	SET=0,MULTISET=1
 };
+template<typename DataType>
+bool remove_duplicates_function (DataType&d1,uint32_t&c1,DataType*v1,uint32_t*v2,const uint32_t){
+	c1 = 1 ; 
+}
+template<typename DataType>
+bool standardize_element (DataType&d1,uint32_t&c1,DataType*v1,uint32_t*v2,const uint32_t){
+	d1=d1-v1[0];
+	d1 =d1/v1[1] ; 
+}
 
 template<typename DataType>
 class multiset{
@@ -41,6 +50,9 @@ class multiset{
 		bool pmf_tour(const node<DataType>*src_tree_ptr,std::vector<double>&pmf_vec,uint32_t &counter)const;
 		bool cmf_tour(const node<DataType>*src_tree_ptr,std::vector<double>&pmf_vec,uint32_t &counter)const;
 		bool addition_tour(node<DataType>*src_tree_ptr,const bst<DataType>*intersect_tree)const;
+		bool apply_function_tour(node<DataType>*src_tree_ptr,bool(*f_ptr)(DataType&,uint32_t&,
+														  	  		  DataType*,uint32_t*,const uint32_t),
+																	  DataType*v1,uint32_t*v2,uint32_t size);
 
 	public:
 		multiset(void);		
@@ -71,7 +83,10 @@ class multiset{
 		std::vector<double> cmf(void)const ;
 		DataType standard_deviation(void)const;
 		DataType range(void) const ; 
-		
+		bool remove_duplicates(void);    
+		bool replace(const DataType&old_data,const DataType&new_data) ;
+		multiset normalize(void) ;
+
 };
 
 #endif 
