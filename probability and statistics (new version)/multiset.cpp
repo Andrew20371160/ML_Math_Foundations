@@ -14,13 +14,24 @@ multiset<DataType>::multiset(const int& wanted_mode){
 	else{
 		mode =  MULTISET;
 	}
+}		
+template<typename DataType>
+multiset<DataType>::multiset(const DataType*arr,const uint32_t &size){
+	mode=  MULTISET ;
+	if(arr){
+		for(uint32_t i= 0 ;i<size;i++){
+			tree.insert(arr[i]);
+		}
+		tree.balance();
+	}
 }
+
 template<typename DataType>
 bool multiset<DataType>::set_mode(const int &wanted_mode){
 	if(wanted_mode==SET||wanted_mode==MULTISET){
 		if(wanted_mode!=mode){
 			if(mode ==MULTISET){
-				//change every elements count to 1
+				remove_duplicates();
 			}
 			mode = wanted_mode;	
 			return 1;
@@ -451,21 +462,21 @@ bool multiset<DataType>::unique_elements_tour(const node<DataType>*src_tree_ptr,
 	}
 
 	template<typename DataType>
-	bool multiset<DataType>::median_tour(const node<DataType>*src_tree_ptr,const node<DataType>*&median_ptr)const {
+	bool multiset<DataType>::moden_tour(const node<DataType>*src_tree_ptr,const node<DataType>*&moden_ptr)const {
 		if(src_tree_ptr){
 			if(src_tree_ptr->left){
-				median_tour(src_tree_ptr->left,median_ptr) ;
+				moden_tour(src_tree_ptr->left,moden_ptr) ;
 			}
-			if(median_ptr==NULL){
-				median_ptr=src_tree_ptr;  
+			if(moden_ptr==NULL){
+				moden_ptr=src_tree_ptr;  
 			}
 			else{
-				if(src_tree_ptr->counter>median_ptr->counter){
-					median_ptr = src_tree_ptr ; 
+				if(src_tree_ptr->counter>moden_ptr->counter){
+					moden_ptr = src_tree_ptr ; 
 				}
 			}
 			if(src_tree_ptr->right){
-				median_tour(src_tree_ptr->right,median_ptr) ;
+				moden_tour(src_tree_ptr->right,moden_ptr) ;
 			}
 			return 0;
 		}
@@ -539,11 +550,11 @@ bool multiset<DataType>::unique_elements_tour(const node<DataType>*src_tree_ptr,
 		return 0;
 	}
 	template<typename DataType>
-	DataType multiset<DataType>::median(void)const {
+	DataType multiset<DataType>::moden(void)const {
 		if(tree.nodes_count){
-			const node<DataType>*ret_median =NULL; 
-			median_tour(tree.root,ret_median) ; 
-			return ret_median->data ;
+			const node<DataType>*ret_moden =NULL; 
+			moden_tour(tree.root,ret_moden) ; 
+			return ret_moden->data ;
 		}
 		std::cout<<"\nemtpy tree";
 		DataType garbage_val ; 
