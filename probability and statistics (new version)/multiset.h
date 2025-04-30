@@ -2,11 +2,12 @@
 #define _multiset_h_
 #include "bst.h" 
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 enum mode {
 	SET=0,MULTISET=1
 };
+
 template<typename DataType>
 bool remove_duplicates_function (DataType&d1,uint32_t&c1,DataType*v1,uint32_t*v2,const uint32_t){
 	c1 = 1 ; 
@@ -16,6 +17,8 @@ bool standardize_element (DataType&d1,uint32_t&c1,DataType*v1,uint32_t*v2,const 
 	d1=d1-v1[0];
 	d1 =d1/v1[1] ; 
 }
+
+uint32_t choose(const uint32_t &num);
 
 template<typename DataType>
 class multiset{
@@ -38,7 +41,14 @@ class multiset{
 		bool contain_tour(const node<DataType>*src_tree_ptr,const bst<DataType>*other_tree,
 					      uint32_t& match_counter)const;		
 		bool equality_tour(const node<DataType>*src_tree_ptr,const bst<DataType>*other_tree,
-					      uint32_t& match_counter)const;
+					      uint32_t& match_counter)const;		
+		
+		bool draw_no_replace_tour(const node<DataType>*src_tree_ptr,const bst<DataType>*other_tree,
+				     	long double&p,uint32_t &remaining_elements)const;
+
+		bool draw_replace_tour(const node<DataType>*src_tree_ptr,const bst<DataType>*other_tree,
+				     	long double&p)const;
+
 		bool avg_tour(const node<DataType>*src_tree_ptr,DataType& avg)const;
 		
 		bool powered_avg_tour(const node<DataType>*src_tree_ptr,DataType& avg,double power)const;
@@ -85,7 +95,27 @@ class multiset{
 		DataType range(void) const ; 
 		bool remove_duplicates(void);    
 		bool replace(const DataType&old_data,const DataType&new_data) ;
-		multiset normalize(void) ;
+		multiset normalize(void)const  ;
+
+		//without order 
+		/*
+		for in-order
+		long double val = sample_space.prob_draw_replace(event)/tgamma(event.nodes_count()+1) ;
+		since tgamma(n)=(n-1)! 
+		*/
+    	long double prob_draw_no_replace(const multiset&event)const ;
+    	long double prob_draw_replace(const multiset&)const;
+    	//returns number of unique elements in the multiset
+    	uint32_t nodes_count(void)const;
+    	//returns total number of elements in the multiset
+    	uint32_t total_count(void)const;
+
+	    long double prob_cond_draw_no_replace(const multiset&src,const multiset&condition)const;
+	    long double prob_cond_draw_replace(const multiset&src,const multiset&condition)const;
+	    long double prob_cond(const multiset&src,const multiset&condition);
+	    long double prob(const multiset&src)const;
+		bool independence(const multiset&e1,const multiset&e2)const ;
+	    long double bayes(const multiset&src,const multiset&condition)const;    
 
 };
 
