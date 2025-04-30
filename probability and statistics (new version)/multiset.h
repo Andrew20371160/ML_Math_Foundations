@@ -22,8 +22,12 @@ uint32_t choose(const uint32_t &num);
 
 template<typename DataType>
 class multiset{
+
 	private:
+		//bst holding elements where frequency of each element is stored in each node
 		bst<DataType>tree;
+		//either 2 modes : set or multiset 
+		//if set then it doesn't allow for duplicates as normal sets 
 		bool mode ;
 		bool intersection_tour(const node<DataType>*src_tree_ptr,const bst<DataType>*other_tree,
 							   const node<DataType>**match_vector,uint32_t& match_counter)const;
@@ -55,7 +59,7 @@ class multiset{
 
 		bool variance_tour(const node<DataType>*src_tree_ptr,DataType& avg1,DataType&avg2)const;
 
-		bool median_tour (const node<DataType>*src_tree_ptr,const node<DataType>*& median_ptr)const ;
+		bool mode_tour (const node<DataType>*src_tree_ptr,const node<DataType>*& mode_ptr)const ;
 
 		bool pmf_tour(const node<DataType>*src_tree_ptr,std::vector<double>&pmf_vec,uint32_t &counter)const;
 		bool cmf_tour(const node<DataType>*src_tree_ptr,std::vector<double>&pmf_vec,uint32_t &counter)const;
@@ -65,36 +69,77 @@ class multiset{
 																	  DataType*v1,uint32_t*v2,uint32_t size);
 
 	public:
+		//empty multiset by default mode is multiset 
 		multiset(void);		
+		//copy constructor same mode of input set is used 
 		multiset(const multiset&) ;
+		//assignment operator
 		multiset&operator =(const multiset&) ; 
+
+		//by defaults mode is multiset initializes the multiset with array elements
+		//then balances the tree for efficient computations
+		multiset(const DataType*,const uint32_t &size);
+		//initializes an empty set with wanted mode either set or multiset
 		multiset(const int&);
+		//destructor
 		~multiset(void) ;
+		//sets mode of the current set either set or multiset 
+		//if it was multiset then duplicates are removed
 		bool set_mode(const int&);
+		//insert an element with a count of it 
+		//if mode is set then this count is ignored and only inserts one element
 		bool insert(const DataType& ,const uint32_t c=1) ;
+		//removes all instances of an element in the set
 		bool remove(const DataType& ) ;
+		//removes every element in the set
 		bool clear(void);
+		//returns 1 if element is found in the set
 		bool search(const DataType&)const ;
+		//adjusts count of an element in a set
+		//if 0 then element is removed
+		//else behaviour is based on the mode 
 		bool adjust_count(const DataType&,const uint32_t&);
+		//returns count of an element in the set/multiset
 		uint32_t count(const DataType&)const ;	
+		//returns intersection of 2 multisets/sets
 		multiset intersect(const multiset&) const;
+		////returns union of 2 multisets/sets
 		multiset unite(const multiset&) const;
-		multiset operator-(const multiset&) const;	
+		//retuns difference of 2 multisets/sets
+		multiset operator-(const multiset&) const;
+		//retunrs addition of 2 multisets	
 		multiset operator+(const multiset&) const;	
+		//returns 1 if phantom contains or is equal to input
 		bool operator>=(const multiset&) const;
+		//returns 1 if input contains or is equal to phantom
 		bool operator<=(const multiset&) const;
+		//returns 1 if phantom equals input
 		bool operator==(const multiset&) const;
+		//returns weighted average of elements within a set/multiset
 		DataType average(void)const ;	
-		DataType average(const double&)const;	
+		//returns E(x^power) or expected value of power of elements
+		DataType average(const double&power)const;	
+		//returns variance of elements 
 		DataType variance(void)const ;
+		//prints the elements of the set/multiset
 		void display(void)const;
-		DataType median(void)const ;
+		//returns the most frequent element in the set/multiset
+		DataType mode(void)const ;
+		//returns probability mass function of the elements 
+		//from minimum element till max elements in a vector
 		std::vector<double> pmf(void)const ;
+		//returns Cumulative mass function of the elements 
+		//from minimum element till max elements in a vector
 		std::vector<double> cmf(void)const ;
+		//returns standard deviation of the elements
 		DataType standard_deviation(void)const;
+		//returns max_elements - min_element in the set
 		DataType range(void) const ; 
+		//removes each duplicates of every element and sets each to 1 only
 		bool remove_duplicates(void);    
+		//replaces an element in the set with new data
 		bool replace(const DataType&old_data,const DataType&new_data) ;
+		//z-score normalization returns it in a set 
 		multiset normalize(void)const  ;
 
 		//without order 
@@ -105,16 +150,26 @@ class multiset{
 		*/
     	long double prob_draw_no_replace(const multiset&event)const ;
     	long double prob_draw_replace(const multiset&)const;
+    	
     	//returns number of unique elements in the multiset
     	uint32_t nodes_count(void)const;
     	//returns total number of elements in the multiset
     	uint32_t total_count(void)const;
-
+    	//conditional probability of drawing without replacement 
 	    long double prob_cond_draw_no_replace(const multiset&src,const multiset&condition)const;
+	    //conditional probability of drawing with replacement 
 	    long double prob_cond_draw_replace(const multiset&src,const multiset&condition)const;
-	    long double prob_cond(const multiset&src,const multiset&condition);
+
+	    //the following set of functions treats whole set as an individual event 
+	    //if it's contained within the sample space it reutnrs 
+
+	    //total number of elements in src /total number of elements in sample space
 	    long double prob(const multiset&src)const;
+	    //conditional probability using prob function
+	    long double prob_cond(const multiset&src,const multiset&condition);
+	    //retuns true if event1 and event2 are independent in the sample space of phantom
 		bool independence(const multiset&e1,const multiset&e2)const ;
+		//bayse rule using prob function
 	    long double bayes(const multiset&src,const multiset&condition)const;    
 
 };
