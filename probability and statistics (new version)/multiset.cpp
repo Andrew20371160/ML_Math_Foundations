@@ -1,4 +1,6 @@
 #include "multiset.h"
+const long double M_PI =3.14159265358979323846;
+const long double thresh_hold= 10e-10;
 
 template<typename DataType>
 multiset<DataType>::multiset(void){
@@ -661,16 +663,176 @@ bool multiset<DataType>::unique_elements_tour(const node<DataType>*src_tree_ptr,
 		return 0; 
 	}  
 	template<typename DataType>
-	multiset<DataType> multiset<DataType>::normalize(void) {
+	multiset<DataType> multiset<DataType>::normalize(void) const{
 		if(tree.nodes_count){
 			multiset<DataType>ret_set = *this;
 			DataType *avg_and_stddev= new DataType[2] ;
 			avg_and_stddev[0] = average() ;
 			avg_and_stddev[1] = standard_deviation();
-			apply_function_tour(ret_set.tree.root,standardize_element,avg_and_stddev,NULL,2) ;
+			ret_set.apply_function_tour(ret_set.tree.root,standardize_element,avg_and_stddev,NULL,2) ;
 			delete[]avg_and_stddev ;avg_and_stddev =NULL;
 			return ret_set; 
 		}
 		return multiset(); 
 	}
+	template<typename DataType>
+	bool multiset<DataType>::draw_no_replace_tour(const node<DataType>*src_tree_ptr,const bst<DataType>*sample_space,
+				     	long double&p,uint32_t &remaining_elements)const{
+		if(src_tree_ptr&&sample_space){
+			if(src_tree_ptr->left){
+				draw_no_replace_tour(src_tree_ptr->left,sample_space,p,remaining_elements);
+			}
+			node<DataType>*temp_node = sample_space->get_node(src_tree_ptr->data); 			
+			if(temp_node){
+				if(temp_node->counter>=src_tree_ptr->counter){
+					for(uint32_t i =temp_node->counter;i>(temp_node->counter-src_tree_ptr->counter);i--){
+						p*=static_cast<long double>(i)/static_cast<long double>(remaining_elements);
+						remaining_elements--;
+					}
+				}
+				else{
+					p=0 ;
+				}
+			}
+			else{
+				p=0;
+			}
+			if(src_tree_ptr->right){
+				draw_no_replace_tour(src_tree_ptr->right,sample_space,p,remaining_elements);
+			}
+			return 1 ; 
+		}
+		return 0; 
+	}	
+
+	template<typename DataType>
+	bool multiset<DataType>::draw_replace_tour(const node<DataType>*src_tree_ptr,const bst<DataType>*sample_space,
+				     	long double&p)const{
+		if(src_tree_ptr&&sample_space){
+			if(src_tree_ptr->left){
+				draw_replace_tour(src_tree_ptr->left,sample_space,p);
+			}
+			node<DataType>*temp_node = sample_space->get_node(src_tree_ptr->data); 			
+			if(temp_node){
+				if(temp_node->counter>=src_tree_ptr->counter){
+					p*=static_cast<long double>(pow(temp_node->counter,src_tree_ptr->counter))/
+					static_cast<long double>(pow(sample_space->total_count,src_tree_ptr->counter));
+				}
+				else{
+					p=0 ;
+				}
+			}
+			else{
+				p=0;
+			}
+			if(src_tree_ptr->right){
+				draw_replace_tour(src_tree_ptr->right,sample_space,p);
+			}
+			return 1 ; 
+		}
+		return 0; 
+	}	
+
+	template<typename DataType>
+    long double multiset<DataType>::prob_draw_no_replace(const multiset&event)const {
+    	if(event.tree.root&&tree.root){
+	    	long double ret_val =1; 
+	    	uint32_t remaining_elements =tree.total_count; 
+	    	draw_no_replace_tour(event.tree.root,&tree,ret_val, remaining_elements);
+	    	return ret_val*tgamma(event.tree.nodes_count+1);
+	    }
+	    else if(event.tree.root){
+	    	//can't draw event from empty set
+	    	return 0 ; 
+	    }
+	    else if(tree.root){
+	    	return 1 ; 
+	    }
+	    //can draw empty set from empty set
+	    return 1; 
+    }  
+
+	template<typename DataType>
+    long double multiset<DataType>::prob_draw_replace(const multiset&event)const {
+    	if(event.tree.root&&tree.root){
+	    	long double ret_val =1; 
+	    	draw_replace_tour(event.tree.root,&tree,ret_val);
+	    	return ret_val*tgamma(event.tree.nodes_count+1);
+	    }
+	    else if(event.tree.root){
+	    	//can't draw event from empty set
+	    	return 0 ; 
+	    }
+	    else if(tree.root){
+	    	return 1 ; 
+	    }
+	    //can draw empty set from empty set
+	    return 1; 
+    }  
+	template<typename DataType>
+
+	uint32_t multiset<DataType>::nodes_count(void)const{
+		return tree.nodes_count; 
+	}	
+	template<typename DataType>
+	uint32_t multiset<DataType>::total_count(void)const{
+		return tree.total_count;
+	}
+
+	template<typename DataType>
+    long double  multiset<DataType>::prob_cond_draw_no_replace(const multiset&src,const multiset&condition)const{
+    	if(*this>=condition){    		
+    		return condition.prob_draw_no_replace(src);
+    	} 
+    	std::cout<<"\ncondition can't be drawn from sample space";
+    	return -1;
+    }
+
+	template<typename DataType>
+    long double  multiset<DataType>::prob_cond_draw_replace(const multiset&src,const multiset&condition)const{
+    	if(*this>=condition){
+    		return condition.prob_draw_replace(src);
+    	} 
+    	std::cout<<"\ncondition can't be drawn from sample space";
+    	return -1;
+    }
+
+	uint32_t choose(const uint32_t& n,const uint32_t &k){
+		return tgamma(n+1)/(tgamma(n-k+1)*tgamma(k+1));
+	}    
+
+	template<typename DataType>
+    long double multiset<DataType>::prob(const multiset&src)const{
+        if(*this>=src){
+            return static_cast<double>(src.tree.total_count)/static_cast<double>(tree.total_count);
+        }
+        return 0 ;
+    }
+
+	template<typename DataType>
+    long double  multiset<DataType>::prob_cond(const multiset&src,const multiset&condition){
+    	if(*this>=condition){
+    		return condition.prob(src);
+    	}
+    	std::cout<<"\ncondition can't be drawn from sample space";
+    	return -1;
+    }
+
+	template<typename DataType>
+	bool multiset<DataType>::independence(const multiset&e1,const multiset&e2)const {
+		long double p_e1 = prob(e1);
+		long double p_e2 = prob(e2);
+		long double p_e1_inter_e2 = prob(e1.intersect(e2));
+		return fabs(p_e1*p_e2-p_e1_inter_e2)<=thresh_hold;
+	}
+
+	template<typename DataType>
+	long double multiset<DataType>::bayes(const multiset&src,const multiset&condition)const{
+		long double p_cond = prob(condition);
+		if(p_cond>0){
+			return prob_cond(condition,src)*prob(src)/p_cond;
+		}    	
+		std::cout<<"\ncondition can't be drawn from sample space";
+		return -1; 
+	}    
 
