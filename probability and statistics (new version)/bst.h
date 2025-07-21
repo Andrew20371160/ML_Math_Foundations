@@ -31,7 +31,7 @@ class bst{
         node<DataType>*get_node(const DataType&)const;
         node<DataType>*remove_node_tour(const DataType&,node<DataType>*);
         void collect_tree_vector_tour(const node<DataType>* ,node<DataType>**tree_vector,uint32_t &current_position)const;
-        node<DataType>*balance_tour(const node<DataType>**tree_vector,const uint32_t &start ,const uint32_t& end ) const;        
+        node<DataType>*balance_tour(node<DataType>**tree_vector,const uint32_t &start ,const uint32_t& end ) const;        
         int64_t height_tour(const node<DataType>*ptr) const;
         node<DataType>*copy_tree(const node<DataType>*) ;
         node<DataType>*max(void)const ;
