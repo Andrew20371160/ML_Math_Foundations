@@ -2,6 +2,8 @@
 #define _bst_h_
 #include <stdint.h>
 #include <iostream>
+#include <queue>
+
 template<typename DataType> 
 class node{
     template<typename T> friend class bst;      
@@ -31,6 +33,9 @@ class bst{
         node<DataType>*get_node(const DataType&)const;
         node<DataType>*remove_node_tour(const DataType&,node<DataType>*);
         void collect_tree_vector_tour(const node<DataType>* ,node<DataType>**tree_vector,uint32_t &current_position)const;
+
+        void collect_tree_vector_tour_same_structure(node<DataType>**tree_vector)const;
+
         node<DataType>*balance_tour(node<DataType>**tree_vector,const uint32_t &start ,const uint32_t& end ) const;        
         int64_t height_tour(const node<DataType>*ptr) const;
         node<DataType>*copy_tree(const node<DataType>*) ;
