@@ -219,24 +219,19 @@ bool multiset<DataType>::unique_elements_tour(node<DataType>*src_tree_ptr,const 
 		if(tree.nodes_count&&src_mset.tree.nodes_count){
 			//what's in a only and in both a and b
 			node<DataType>**intersection_vec = new node<DataType>*[tree.nodes_count] ;
-            cout<<tree.nodes_count<<endl;
 			uint32_t intersection_counter = 0;
 			union_tour(tree.root,&src_mset.tree,intersection_vec,intersection_counter);
-            cout<<intersection_counter<<endl;
 
 			//what's unique to source
 
 			node<DataType>**unique_in_src = new node<DataType>*[src_mset.tree.nodes_count] ;
-            cout<<src_mset.tree.nodes_count<<endl;
 
 			uint32_t unique_in_src_counter = 0;
 			src_mset.unique_elements_tour(src_mset.tree.root,&tree,unique_in_src,unique_in_src_counter);
-            cout<<unique_in_src_counter<<endl;
 
 			//merge 2 vectors into one union vector
 			uint32_t union_size=intersection_counter+unique_in_src_counter;
 			node<DataType>**union_vec=  new node<DataType>*[union_size] ;
-            cout<<union_size ;
 			merge(union_vec,intersection_vec,unique_in_src,intersection_counter,unique_in_src_counter) ;
 
 			//delete allocated memory
@@ -257,7 +252,7 @@ bool multiset<DataType>::unique_elements_tour(node<DataType>*src_tree_ptr,const 
 	}
 
 	template<typename DataType>
-	multiset <DataType> multiset<DataType>:: operator-(const multiset&src_mset) const{
+	multiset <DataType> multiset<DataType>:: difference(const multiset&src_mset) const{
 		if(tree.nodes_count&&src_mset.tree.nodes_count){
 			//fill diff vec with elements in a that has bigger count than b where the count in subtracted
 			node<DataType>**diff_vec = new node<DataType>*[(src_mset.tree.nodes_count<tree.nodes_count)?src_mset.tree.nodes_count:tree.nodes_count] ;
@@ -620,23 +615,117 @@ bool multiset<DataType>::unique_elements_tour(node<DataType>*src_tree_ptr,const 
 		return 1 ;
 	}
 
+
+
 	template<typename DataType>
 	multiset<DataType> multiset<DataType>::operator+(const multiset&src) const{
 		if(tree.nodes_count&&src.tree.nodes_count){
-			multiset<DataType>ret_set = this->unite(src) ;
-			multiset<DataType>intersection  = this->intersect(src) ;
-			addition_tour(ret_set.tree.root,&intersection.tree);
+			node<DataType>**tree_vec = new node<DataType>*[tree.nodes_count];
+			node<DataType>**other_tree_vec = new node<DataType>*[src.tree.nodes_count];
 
-			return ret_set ;
+			tree.collect_tree_vector_tour_same_structure(tree_vec);
+			src.tree.collect_tree_vector_tour_same_structure(other_tree_vec);
+			multiset<DataType> ret_set;
+			for(uint32_t i = 0; i <tree.nodes_count;i++){
+				for(uint32_t j=0 ;j<src.tree.nodes_count;j++){
+					ret_set.insert(tree_vec[i]->data+other_tree_vec[j]->data,
+								   tree_vec[i]->counter*other_tree_vec[j]->counter);
+				}
+			}
+			delete[]tree_vec;
+			delete[]other_tree_vec;
+			return ret_set;
 		}
-		if(tree.nodes_count){
+		else if(tree.nodes_count){
+			return *this;
+		}
+		return src;
+	}	
+	template<typename DataType>
+	multiset<DataType> multiset<DataType>::operator-(const multiset&src) const{
+		if(tree.nodes_count&&src.tree.nodes_count){
+			node<DataType>**tree_vec = new node<DataType>*[tree.nodes_count];
+			node<DataType>**other_tree_vec = new node<DataType>*[src.tree.nodes_count];
+			tree.collect_tree_vector_tour_same_structure(tree_vec);
+			src.tree.collect_tree_vector_tour_same_structure(other_tree_vec);
+			multiset<DataType> ret_set;
+			for(uint32_t i = 0; i <tree.nodes_count;i++){
+				for(uint32_t j=0 ;j<src.tree.nodes_count;j++){
+					ret_set.insert(tree_vec[i]->data-other_tree_vec[j]->data,
+								   tree_vec[i]->counter*other_tree_vec[j]->counter);
+				}
+			}
+			delete[]tree_vec;
+			delete[]other_tree_vec;			
+			return ret_set;
+
+		}
+		else if(tree.nodes_count){
 			return *this;
 		}
 		else if(src.tree.nodes_count){
-			return src ;
+			return src.axpy(DataType(-1),DataType(0));
 		}
-		return multiset() ;
+		return multiset<DataType>() ;
+	}			
+	//ret_set = a *x +b
+	template<typename DataType>
+	multiset<DataType> multiset<DataType>::axpy(const DataType&a ,const DataType&b)const{
+		multiset<DataType>ret_set;
+		node<DataType>**tree_vec = new node<DataType>*[tree.nodes_count];
+		tree.collect_tree_vector_tour_same_structure(tree_vec);
+		for(uint32_t i =0 ; i<tree.nodes_count;i++){
+			ret_set.insert(a*tree_vec[i]->data+b,
+							 tree_vec[i]->counter);
+		}
+		delete[]tree_vec;
+		return ret_set; 
 	}
+
+	
+	template<typename DataType>
+	multiset<DataType> multiset<DataType>::operator*(const multiset&src) const{
+		if(tree.nodes_count&&src.tree.nodes_count){
+			node<DataType>**tree_vec = new node<DataType>*[tree.nodes_count];
+			node<DataType>**other_tree_vec = new node<DataType>*[src.tree.nodes_count];
+			tree.collect_tree_vector_tour_same_structure(tree_vec);
+			src.tree.collect_tree_vector_tour_same_structure(other_tree_vec);
+			multiset<DataType> ret_set;
+			for(uint32_t i = 0; i <tree.nodes_count;i++){
+				for(uint32_t j=0 ;j<src.tree.nodes_count;j++){
+					ret_set.insert(tree_vec[i]->data*other_tree_vec[j]->data,
+								   tree_vec[i]->counter*other_tree_vec[j]->counter);
+				}
+			}
+			delete[]tree_vec;
+			delete[]other_tree_vec;			
+			return ret_set;
+
+		}
+		return multiset<DataType>();
+	}
+	template<typename DataType>
+	multiset<DataType> multiset<DataType>::operator/(const multiset&src) const{
+		if(tree.nodes_count&&src.tree.nodes_count){
+			node<DataType>**tree_vec = new node<DataType>*[tree.nodes_count];
+			node<DataType>**other_tree_vec = new node<DataType>*[src.tree.nodes_count];
+			tree.collect_tree_vector_tour_same_structure(tree_vec);
+			src.tree.collect_tree_vector_tour_same_structure(other_tree_vec);
+			multiset<DataType> ret_set;
+			for(uint32_t i = 0; i <tree.nodes_count;i++){
+				for(uint32_t j=0 ;j<src.tree.nodes_count;j++){
+					ret_set.insert(tree_vec[i]->data/other_tree_vec[j]->data,
+								   tree_vec[i]->counter*other_tree_vec[j]->counter);
+				}
+			}			
+			delete[]tree_vec;
+			delete[]other_tree_vec;			
+			return ret_set;
+
+		}
+		return multiset<DataType>();
+	}
+
 	template<typename DataType>
 	DataType multiset<DataType>::standard_deviation(void)const{
 		return DataType(sqrt(variance()));
@@ -862,12 +951,17 @@ bool multiset<DataType>::unique_elements_tour(node<DataType>*src_tree_ptr,const 
 
 int main(){
 
-	multiset<int>s1,s2;
-	s1.insert(5,8);
-	s1.insert(1,2);
-	s1.insert(4,1);
-    s2 = s1 ;
-    s2.insert(-1,6);
-    s2 = s1.unite(s2);
-    s2.display();
+	multiset<int>s1,s2,s3;
+	s1.insert(3,1);
+	s1.insert(1,1);
+
+	s2.insert(3,2);
+	s2.insert(4,1);
+
+	s3 = s1-s2;
+	cout<<s1.average()<<endl;
+	cout<<s2.average()<<endl;
+	cout<<s3.average()<<endl;
+	
+
 }
