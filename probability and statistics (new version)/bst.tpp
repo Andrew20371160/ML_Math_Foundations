@@ -249,6 +249,28 @@
             }
         }
     }    
+
+    template<typename DataType>
+    void bst<DataType>:: collect_tree_vector_tour_same_structure(node<DataType>**tree_vector)const{
+        if(root){
+            std::queue<node<DataType>*>q;
+            q.push(root);
+            uint32_t i =0 ;
+            while(!q.empty()){
+                node<DataType>* temp =q.front();
+                q.pop() ;
+
+                tree_vector[i] = temp ;
+                if(temp->left){
+                    q.push(temp->left);
+                }
+                if(temp->right){
+                    q.push(temp->right);
+                }
+                i++;
+            }
+        }
+    }    
     template<typename DataType>
     node<DataType>* bst<DataType>::balance_tour(node<DataType>**tree_vector,const uint32_t &beg ,const uint32_t &end ) const{
         if(beg<=end){
