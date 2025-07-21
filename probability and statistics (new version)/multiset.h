@@ -70,6 +70,7 @@ class multiset{
 														  	  		  DataType*,uint32_t*,const uint32_t),
 																	  DataType*v1,uint32_t*v2,uint32_t size);
 
+
 	public:
 		//empty multiset by default mode is multiset
 		multiset(void);
@@ -108,9 +109,13 @@ class multiset{
 		////returns union of 2 multisets/sets
 		multiset unite(const multiset&) const;
 		//retuns difference of 2 multisets/sets
-		multiset operator-(const multiset&) const;
-		//retunrs addition of 2 multisets
+		multiset difference(const multiset&) const;
+
+		multiset operator/(const multiset&) const;
 		multiset operator+(const multiset&) const;
+		multiset operator*(const multiset&) const;
+		multiset operator-(const multiset&) const;
+
 		//returns 1 if phantom contains or is equal to input
 		bool operator>=(const multiset&) const;
 		//returns 1 if input contains or is equal to phantom
@@ -143,6 +148,8 @@ class multiset{
 		bool replace(const DataType&old_data,const DataType&new_data) ;
 		//z-score normalization returns it in a set
 		multiset normalize(void)const  ;
+		
+		multiset axpy(const DataType&,const DataType&)const;
 
 		//without order
 		/*
