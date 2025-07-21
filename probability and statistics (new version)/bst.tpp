@@ -31,7 +31,7 @@
     bool bst<DataType>::insert(const DataType &d,const uint32_t counter ){
         if(counter!=0){
             if(root==NULL){
-                root = new node(d,counter) ; 
+                root = new node<DataType>(d,counter) ; 
                 nodes_count =1 ; 
                 total_count+=counter ; 
                 return 1 ;
@@ -49,7 +49,7 @@
                             ptr=ptr->left;
                         }
                         else{
-                            ptr->left = new node(d,counter) ;
+                            ptr->left = new node<DataType>(d,counter) ;
                             total_count +=counter; 
                             nodes_count+=1 ; 
                             return 1 ; 
@@ -60,7 +60,7 @@
                             ptr=ptr->right;
                         }
                         else{
-                            ptr->right = new node(d,counter) ;
+                            ptr->right = new node<DataType>(d,counter) ;
                             total_count +=counter; 
                             nodes_count+=1 ; 
                             return 1 ; 
@@ -250,10 +250,10 @@
         }
     }    
     template<typename DataType>
-    node<DataType>* bst<DataType>::balance_tour(const node<DataType>**tree_vector,const uint32_t &beg ,const uint32_t &end ) const{
+    node<DataType>* bst<DataType>::balance_tour(node<DataType>**tree_vector,const uint32_t &beg ,const uint32_t &end ) const{
         if(beg<=end){
             uint32_t mid = (beg+end)/2;
-            node<DataType>*ptr = new node(tree_vector[mid]->data,tree_vector[mid]->counter) ; 
+            node<DataType>*ptr = new node<DataType>(tree_vector[mid]->data,tree_vector[mid]->counter) ; 
             //so that overflow doesn't happen 
             if(mid!=0){
                 ptr->left = balance_tour(tree_vector,beg,mid-1);
@@ -300,7 +300,7 @@
     template<typename DataType>
     node<DataType>*bst<DataType>::copy_tree(const node<DataType>*ptr) {
         if(ptr){
-            node<DataType>*ret_root = new node(ptr->data,ptr->counter) ;
+            node<DataType>*ret_root = new node<DataType>(ptr->data,ptr->counter) ;
             if(ptr->left){
                 ret_root->left =copy_tree(ptr->left) ;
             }
