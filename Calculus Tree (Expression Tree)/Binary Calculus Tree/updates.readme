@@ -1,0 +1,39 @@
+10/25/2024 update:
+fixed an issue where simpson's 3/8 rule would always return 0 returning final value multiplied by 3/8 which results in integer dividing 
+which always returns zero.
+10/22/2024 update:
+1-added table functionality which evaluates the expression with multiple variables where each set at initial value
+with variable step size for each variable
+
+10/21/2024 updates:
+1-added simpson's (3/8) rule and optimized it along with (1/3) rule to balance traversal of tree (for very large expression)
+and array used in calculations for each (check the header for more info)
+2-renamed both to be simpson_rule_1_3 ,simpson_rule_3_8
+
+10/19/2024 updates:
+1-added simpson's rule (will enhance its performance later)
+2-refactored some code and changed input method of evaluate_at
+3-fixed some errors aswell
+
+10/15/2024 updates:
+1-added switch variable capability say you wanna exchange x with x^2+1 
+the new function exchange does that and returns resuling tree.
+
+2-added assignment operator for any datatype 
+ for ex: tree=  3; ->inializes the tree to be 3 
+ tree= string("x*sin(theta)"); ->sets the expression of the tree to be that string
+
+3-added threshold for floatibg point operation feel free to edit it in calculus_tree.h
+
+10/10/2024 updates:
+1-separated functions and constants evaluation from the calculus tree now they are in a separate file (now it's easier to add new functions or constants)
+2-if you wanna add new constants or functions head to functions_and_known_constants.h and follow the guide you find there.
+3-cleanded some garbage code for ex : get_node and its weird syntax is eliminated.
+
+10/6/2024 updates:
+1-added simplification (only for leaves now will try to add for subtrees later)
+for ex: (1+2)*1*x is now simplified to 3*x
+ofcourse scale that to larger expressions (you get the idea)
+2-added capability to evaluate an expression at a known constant (ex: x= pi)
+3-fixed couple of bugs rearding evaluation
+10/2/2024 updates :contains genration ,evaluation ,differentiation ,save and load of an expression tree
